@@ -12,3 +12,5 @@ Our product will give the solution by analyzing patterns of health related data,
 Our main goal is of restructuring existing relation of patient-doctor. Our product will provide sustainable platform for outpatients and doctors to always stay connected to each other by real-time tracking of outpatients’ health data. In healthcare, privacy is of utmost importance and we will use modern tools and advanced encryption techniques to secure patient’s data.
 
 Today, mobile is ubiquitous and we will take advantage of availability of mobiles through our mobile application. IoT device worn by outpatient will connect with their mobile device. Using our pattern recognition technique, mobile application will recognize fluctuating heart rate of outpatient. It will alert doctors and emergency services of pattern changes of outpatient’s health. As, we will save patient’s data on the cloud, any doctor who is authorized to view health data can access it. Hence, our proposed system will help in bridging the gaps between healthcare facilities and outpatients by integrating them with each other.
+
+##[Project URL](http://deepmehtait.github.io/Connect-Outpatient-Using-IoT/)
