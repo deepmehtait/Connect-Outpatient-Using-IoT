@@ -17,8 +17,48 @@
         <activity android:name=".activity.MainActivity">
 
         </activity>
+        <!--Registration Service-->
+        <service android:name=".gcm.RegistrationIntentService" android:exported="false"/>
+        <!--Instance ID listner -->
+        <service
+            android:name=".gcm.MyInstanceIDListenerService"
+            android:exported="false">
+            <intent-filter>
+                <action android:name="com.google.android.gms.iid.InstanceID"/>
+            </intent-filter>
+        </service>
+        <!--GCM Broadcast Receiver and Message Handler-->
+        <receiver
+            android:name="com.google.android.gms.gcm.GcmReceiver"
+            android:exported="true"
+            android:permission="com.google.android.c2dm.permission.SEND" >
+            <intent-filter>
+                <action android:name="com.google.android.c2dm.intent.RECEIVE" />
+                <category android:name="com.codepath.gcmquickstart" />
+            </intent-filter>
+        </receiver>
+        <!--GCM Listner-->
+        <service
+            android:name=".gcm.GcmMessageHandler"
+            android:exported="false" >
+            <intent-filter>
+                <action android:name="com.google.android.c2dm.intent.RECEIVE" />
+            </intent-filter>
+        </service>
     </application>
+    <!-- Read Phone State for UUID -->
+    <uses-permission android:name="android.permission.READ_PHONE_STATE"></uses-permission>
+    <!--Internet conectivity-->
     <uses-permission android:name="android.permission.INTERNET"></uses-permission>
+    <!--Network check-->
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE"></uses-permission>
+    <!--GCM wakelock-->
+    <uses-permission android:name="android.permission.WAKE_LOCK" />
+    <uses-permission android:name="com.google.android.c2dm.permission.RECEIVE" />
+    <permission android:name="iot.connect.com.connectoutpatient.permission.C2D_MESSAGE"
+        android:protectionLevel="signature" />
+    <uses-permission android:name="iot.connect.com.connectoutpatient.permission.C2D_MESSAGE" />
+
+
 
 </manifest>

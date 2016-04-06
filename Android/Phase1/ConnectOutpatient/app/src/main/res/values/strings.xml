@@ -1,3 +1,4 @@
 <resources>
     <string name="app_name">Connect Outpatient</string>
+    <string name="gcm_defaultSenderId">1051405988728</string>
 </resources>

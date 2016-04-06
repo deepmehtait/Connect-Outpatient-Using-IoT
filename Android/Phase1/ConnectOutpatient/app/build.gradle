@@ -27,4 +27,5 @@ dependencies {
     compile 'com.google.guava:guava:19.0-rc3'
     compile 'com.loopj.android:android-async-http:1.4.9'
     compile 'com.google.code.gson:gson:2.5'
+    compile 'com.google.android.gms:play-services-gcm:8.4.0'
 }
