@@ -1,8 +1,11 @@
 package iot.connect.com.connectoutpatient.activity;
 
+import android.Manifest;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.pm.PackageManager;
+import android.os.Build;
 import android.os.Bundle;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
@@ -17,12 +20,13 @@ import com.google.android.gms.common.GoogleApiAvailability;
 import iot.connect.com.connectoutpatient.R;
 import iot.connect.com.connectoutpatient.gcm.RegistrationIntentService;
 import iot.connect.com.connectoutpatient.utils.AppStatus;
-
+import iot.connect.com.connectoutpatient.utils.ReadPhoneStatePermissionHandle;
 /**
  * Created by Deep on 15-Jan-16.
  */
 public class MainActivity extends AppCompatActivity {
     private static final int PLAY_SERVICES_RESOLUTION_REQUEST = 9000;
+    final private int REQUEST_CODE_ASK_PERMISSIONS = 123;
     private static final String TAG = "MainActivity";
 
     @Override
@@ -34,10 +38,23 @@ public class MainActivity extends AppCompatActivity {
             Intent intent = new Intent(this, RegistrationIntentService.class);
             startService(intent);
         }
-        TelephonyManager tManager = (TelephonyManager)getSystemService(Context.TELEPHONY_SERVICE);
-        String UUID=tManager.getDeviceId();
-        Log.d("UUID= ",UUID);
-        Toast t1=Toast.makeText(this,UUID,Toast.LENGTH_SHORT);
+
+        String UUID=new String();
+        if(Build.VERSION.SDK_INT >= 23){
+            // Marshmallow +
+
+            getUUIDCheck();
+           // return UUID;
+        }else{
+            // Pre-Marshmallow
+            getUUID();
+            //return UUID;
+        }
+
+
+       // ReadPhoneStatePermissionHandle rpsph=new ReadPhoneStatePermissionHandle(this,MainActivity.class);
+        //String UID=rpsph.getDeviceUUID();
+        //Toast t1=Toast.makeText(this,UUID,Toast.LENGTH_SHORT);
         if(AppStatus.getInstance(this).isOnline()) {
 
             Toast t = Toast.makeText(this, "You are online!!!!", Toast.LENGTH_SHORT);
@@ -91,4 +108,42 @@ public class MainActivity extends AppCompatActivity {
         }
         return true;
     }
+    public String getUUID(){
+        String UUID=new String();
+        TelephonyManager tManager = (TelephonyManager)getSystemService(Context.TELEPHONY_SERVICE);
+        UUID=tManager.getDeviceId();
+        Log.d("UUID= ", UUID);
+        return UUID;
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
+        switch (requestCode) {
+            case REQUEST_CODE_ASK_PERMISSIONS:
+                if (grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                    // Permission Granted
+                    getUUID();
+                } else {
+                    // Permission Denied
+                    Toast.makeText(MainActivity.this, "READ_PHONE_STATE Denied", Toast.LENGTH_SHORT)
+                            .show();
+                }
+                break;
+            default:
+                super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        }
+    }
+
+    private void getUUIDCheck() {
+        if (Build.VERSION.SDK_INT >= 23) {
+            int hasPhoneReadStarePermission = checkSelfPermission(Manifest.permission.READ_PHONE_STATE);
+            if (hasPhoneReadStarePermission != PackageManager.PERMISSION_GRANTED) {
+                requestPermissions(new String[]{Manifest.permission.READ_PHONE_STATE}, REQUEST_CODE_ASK_PERMISSIONS);
+                return;
+            }
+
+        }
+        getUUID();
+    }
+
 }
