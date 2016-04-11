@@ -62,7 +62,7 @@
                 android:id="@+id/input_email"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:hint="Email"
+                android:hint="@string/email"
                 android:inputType="textEmailAddress" />
         </android.support.design.widget.TextInputLayout>
 
@@ -77,7 +77,7 @@
                 android:id="@+id/input_password"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:hint="Password"
+                android:hint="@string/Password"
                 android:inputType="textPassword" />
         </android.support.design.widget.TextInputLayout>
         <!-- Confirm Password -->
@@ -91,7 +91,7 @@
                 android:id="@+id/input_password_confirm"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:hint="Confirm Password"
+                android:hint="@string/ConfirmPassword"
                 android:inputType="textPassword" />
         </android.support.design.widget.TextInputLayout>
 
@@ -106,28 +106,31 @@
                 android:layout_height="wrap_content"
                 android:layout_marginLeft="80dp"
                 android:gravity="center"
-                android:orientation="horizontal">
+                android:orientation="horizontal"
+                android:id="@+id/UserTypeRG"
+                android:checkedButton="@+id/radio_paitent">
 
                 <RadioButton
-                    android:id="@+id/radio_pirates"
+                    android:id="@+id/radio_paitent"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:gravity="center"
-                    android:text="Paitent" />
+                    android:text="@string/paitent"
+                    />
 
                 <RadioButton
-                    android:id="@+id/radio_ninjas"
+                    android:id="@+id/radio_doctor"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginLeft="20dp"
                     android:gravity="center"
-                    android:text="Doctor" />
+                    android:text="@string/doctor" />
 
             </RadioGroup>
         </android.support.design.widget.TextInputLayout>
 
         <android.support.v7.widget.AppCompatButton
-            android:id="@+id/btn_login"
+            android:id="@+id/btn_SignUP"
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
             android:layout_marginBottom="24dp"
@@ -135,7 +138,8 @@
             android:background="@color/accent"
             android:padding="12dp"
             android:text="Sign Up"
-            android:textColor="@color/primary_text">
+            android:textColor="#ffffff"
+            android:elevation="10dp">
         </android.support.v7.widget.AppCompatButton>
 
 

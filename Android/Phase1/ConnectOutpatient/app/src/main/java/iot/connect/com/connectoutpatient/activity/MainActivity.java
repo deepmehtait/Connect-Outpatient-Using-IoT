@@ -11,6 +11,9 @@ import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.telephony.TelephonyManager;
 import android.util.Log;
+import android.view.View;
+import android.widget.Button;
+import android.widget.EditText;
 import android.widget.Toast;
 
 
@@ -21,6 +24,8 @@ import iot.connect.com.connectoutpatient.R;
 import iot.connect.com.connectoutpatient.gcm.RegistrationIntentService;
 import iot.connect.com.connectoutpatient.utils.AppStatus;
 import iot.connect.com.connectoutpatient.utils.ReadPhoneStatePermissionHandle;
+import iot.connect.com.connectoutpatient.utils.Validator;
+
 /**
  * Created by Deep on 15-Jan-16.
  */
@@ -28,6 +33,8 @@ public class MainActivity extends AppCompatActivity {
     private static final int PLAY_SERVICES_RESOLUTION_REQUEST = 9000;
     final private int REQUEST_CODE_ASK_PERMISSIONS = 123;
     private static final String TAG = "MainActivity";
+    Button login,noAccount;
+    EditText emailID,password;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -50,6 +57,37 @@ public class MainActivity extends AppCompatActivity {
             getUUID();
             //return UUID;
         }
+        // Buttons
+        login=(Button)findViewById(R.id.btn_login);
+        noAccount=(Button)findViewById(R.id.btn_signup);
+        // Edit text
+        emailID=(EditText)findViewById(R.id.input_email);
+        password=(EditText)findViewById(R.id.input_password);
+        // Login Handle
+        login.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                String emailid=emailID.getText().toString();
+                if(!Validator.isValidEmail(emailid)){
+                    emailID.setError("Invalid Email");
+                }
+                String pass=password.getText().toString();
+                if(!Validator.isValidPassword(pass)){
+                    password.setError("Invalid Password");
+                }
+
+
+            }
+        });
+        //  Signup Handle
+        noAccount.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent i=new Intent(MainActivity.this,SignUpActivity.class);
+                startActivity(i);
+            }
+        });
+
 
 
        // ReadPhoneStatePermissionHandle rpsph=new ReadPhoneStatePermissionHandle(this,MainActivity.class);

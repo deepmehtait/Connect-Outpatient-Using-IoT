@@ -17,6 +17,10 @@
         <activity android:name=".activity.MainActivity">
 
         </activity>
+        <activity android:name=".activity.SignUpActivity">
+
+        </activity>
+
         <!--Registration Service-->
         <service android:name=".gcm.RegistrationIntentService" android:exported="false"/>
         <!--Instance ID listner -->
