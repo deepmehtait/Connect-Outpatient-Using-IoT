@@ -75,6 +75,8 @@ public class MainActivity extends AppCompatActivity {
                 if(!Validator.isValidPassword(pass)){
                     password.setError("Invalid Password");
                 }
+                Intent i=new Intent(getApplicationContext(),GraphActivity.class);
+                startActivity(i);
 
 
             }

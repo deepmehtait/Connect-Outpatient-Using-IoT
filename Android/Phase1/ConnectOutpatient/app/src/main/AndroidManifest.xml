@@ -20,6 +20,9 @@
         <activity android:name=".activity.SignUpActivity">
 
         </activity>
+        <activity android:name=".activity.GraphActivity">
+
+        </activity>
 
         <!--Registration Service-->
         <service android:name=".gcm.RegistrationIntentService" android:exported="false"/>
