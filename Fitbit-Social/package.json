@@ -1,0 +1,24 @@
+{
+  "name": "Connect Outpatient",
+  "version": "1.0.0",
+  "description": "",
+  "main": "server.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node server.js"
+  },
+  "author": "Akshay Talathi",
+
+  "dependencies": {
+    "bluebird": "^3.3.4",
+    "body-parser": "^1.15.0",
+    "cors": "^2.7.1",
+    "express": "^4.13.4",
+    "express-session": "^1.13.0",
+    "lodash": "^4.7.0",
+    "passport": "^0.3.2",
+    "passport-fitbit-oauth2": "^1.0.1",
+    "request": "^2.69.0"
+  },
+  "devDependencies": {}
+}
