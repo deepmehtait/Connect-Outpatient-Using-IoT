@@ -24,8 +24,12 @@ dependencies {
     testCompile 'junit:junit:4.12'
     compile 'com.android.support:appcompat-v7:23.1.1'
     compile 'com.android.support:design:23.1.1'
+    compile 'com.mcxiaoke.volley:library:1.0.19'
     compile 'com.google.guava:guava:19.0-rc3'
-    compile 'com.loopj.android:android-async-http:1.4.9'
+    compile 'com.android.support:support-v4:23.2.0'
+    compile 'com.squareup.picasso:picasso:2.5.2'
     compile 'com.google.code.gson:gson:2.5'
     compile 'com.google.android.gms:play-services-gcm:8.4.0'
+    compile 'com.jjoe64:graphview:4.0.1'
+
 }
