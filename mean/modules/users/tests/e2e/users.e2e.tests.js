@@ -129,7 +129,7 @@ describe('Users E2E Tests:', function () {
       expect(element.all(by.css('.error-text')).get(0).getText()).toBe('Username is required.');
     });
 
-    it('Should report a password with less than 10 characters long - "P@$$w0rd!"', function () {
+    it('Should report a password with less than 7 characters long - "P@$$w"', function () {
       browser.get('http://localhost:3001/authentication/signup');
       // Enter First Name
       element(by.model('credentials.firstName')).sendKeys(user1.firstName);
@@ -144,7 +144,7 @@ describe('Users E2E Tests:', function () {
       // Click Submit button
       element(by.css('button[type=submit]')).click();
       // Password Error
-      expect(element.all(by.css('.error-text')).get(0).getText()).toBe('The password must be at least 10 characters long.');
+      expect(element.all(by.css('.error-text')).get(0).getText()).toBe('The password must be at least 7 characters long.');
     });
 
     it('Should report a password with greater than 128 characters long.', function () {
@@ -339,16 +339,16 @@ describe('Users E2E Tests:', function () {
       expect(element.all(by.css('.error-text')).get(2).getText()).toBe('Verify your new password.');
     });
 
-    it('Should report a password with less than 10 characters long - "P@$$w0rd!"', function () {
+    it('Should report a password with less than 7 characters long - "P@$$w0rd!"', function () {
       browser.get('http://localhost:3001/settings/password');
       // Enter Current Password
       element(by.model('passwordDetails.currentPassword')).sendKeys(user1.password);
       // Enter Invalid Password
-      element(by.model('passwordDetails.newPassword')).sendKeys('P@$$w0rd!');
+      element(by.model('passwordDetails.newPassword')).sendKeys('P@$$w');
       // Click Submit button
       element(by.css('button[type=submit]')).click();
       // Password Error
-      expect(element.all(by.css('.error-text')).get(0).getText()).toBe('The password must be at least 10 characters long.');
+      expect(element.all(by.css('.error-text')).get(0).getText()).toBe('The password must be at least 7 characters long.');
     });
 
     it('Should report a password with greater than 128 characters long.', function () {

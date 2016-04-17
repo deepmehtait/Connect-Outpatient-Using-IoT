@@ -94,7 +94,7 @@
 
       expect(scope.form.password.$valid).toBeFalsy();
       expect(scope.form.password.$error.required).toBeFalsy();
-      expect(scope.passwordErrors).toEqual(['The password must be at least 10 characters long.']);
+      expect(scope.passwordErrors).toEqual(['The password must be at least 7 characters long.']);
       expect(scope.requirementsColor).toEqual('primary');
       expect(scope.requirementsProgress).toEqual('80');
     });

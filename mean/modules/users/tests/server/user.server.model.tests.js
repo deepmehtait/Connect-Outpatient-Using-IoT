@@ -90,7 +90,7 @@ describe('User Model Unit Tests:', function () {
 
       _user1.save(function (err) {
         should.not.exist(err);
-        _user1.roles = ['user', 'admin'];
+        _user1.roles = ['patient','doctor', 'admin'];
         _user1.save(function (err) {
           should.not.exist(err);
           _user1.remove(function (err) {
@@ -263,12 +263,12 @@ describe('User Model Unit Tests:', function () {
       });
     });
 
-    it('should not allow a less than 10 characters long - "P@$$w0rd!"', function (done) {
+    it('should not allow a less than 7 characters long - "P@$$w0rd!"', function (done) {
       var _user1 = new User(user1);
-      _user1.password = 'P@$$w0rd!';
+      _user1.password = 'P@$$w';
 
       _user1.validate(function (err) {
-        err.errors.password.message.should.equal('The password must be at least 10 characters long.');
+        err.errors.password.message.should.equal('The password must be at least 7 characters long.');
         done();
       });
     });
