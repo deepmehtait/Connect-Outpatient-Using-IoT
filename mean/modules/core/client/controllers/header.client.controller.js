@@ -16,9 +16,9 @@ angular.module('core').controller('HeaderController', ['$scope', '$state', 'Auth
     };
 
     $scope.checkAuthenticatedUser = function(user){
-      var result = "landing";
-      if(user)result = "home";
-      return result;
+      var newState = "landing";
+      if(user)newState = "home";
+      return $state.href(newState);
     };
     // Collapsing the menu after navigation
     $scope.$on('$stateChangeSuccess', function () {
