@@ -17,8 +17,19 @@ import android.widget.EditText;
 import android.widget.Toast;
 
 
+import com.android.volley.Request;
+import com.android.volley.Response;
+import com.android.volley.VolleyError;
+import com.android.volley.toolbox.StringRequest;
+import com.android.volley.toolbox.Volley;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GoogleApiAvailability;
+
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import java.util.HashMap;
+import java.util.Map;
 
 import iot.connect.com.connectoutpatient.R;
 import iot.connect.com.connectoutpatient.gcm.RegistrationIntentService;
@@ -75,12 +86,51 @@ public class MainActivity extends AppCompatActivity {
                 if(!Validator.isValidPassword(pass)){
                     password.setError("Invalid Password");
                 }
-                Intent i=new Intent(getApplicationContext(),GraphActivity.class);
-                startActivity(i);
+                /*Intent i=new Intent(getApplicationContext(),GraphActivity.class);
+                startActivity(i);*/
+                String url="http://ec2-54-67-123-247.us-west-1.compute.amazonaws.com/api/auth/signin";
+                StringRequest postRequest=new StringRequest(Request.Method.POST, url, new Response.Listener<String>() {
+                    @Override
+                    public void onResponse(String response) {
+                        try {
+                            JSONObject jsonResponse = new JSONObject(response);
+                            String site = jsonResponse.toString();
+                            Toast.makeText(getApplicationContext(),site,Toast.LENGTH_SHORT).show();
+
+                        } catch (JSONException e) {
+                            e.printStackTrace();
+                        }
+                    }
+
+                },
+                        new Response.ErrorListener(){
+                            @Override
+                            public void onErrorResponse(VolleyError error) {
+                                error.printStackTrace();
+                            }
+                        }){
+                    @Override
+                    protected Map<String, String> getParams()
+                    {
+                        Map<String, String> params = new HashMap<>();
+                        // the POST parameters:
+                        params.put("username", "testuser");
+                        params.put("password", "Qwerty123$");
+                        return params;
+                    }
+                };
+
+
+
+                Volley.newRequestQueue(getApplicationContext()).add(postRequest);
+
 
 
             }
         });
+
+
+
         //  Signup Handle
         noAccount.setOnClickListener(new View.OnClickListener() {
             @Override
