@@ -10,7 +10,7 @@
     /**
     * Store user's fitbit data
     */
-    exports.saveFitBitData = function (req, res) {
+    exports.addFitBitData = function (req, res) {
         // Init Variables
       var fitbit_data = new Fitbitdata(req.body);
       var message = null;
