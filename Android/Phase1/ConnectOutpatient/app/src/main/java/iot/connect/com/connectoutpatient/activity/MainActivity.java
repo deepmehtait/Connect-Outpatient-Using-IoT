@@ -85,11 +85,11 @@ public class MainActivity extends AppCompatActivity {
         login.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                String emailid=emailID.getText().toString();
+                final String emailid=emailID.getText().toString();
                 if(!Validator.isValidEmail(emailid)){
                     emailID.setError("Invalid Email");
                 }
-                String pass=password.getText().toString();
+                final String pass=password.getText().toString();
                 if(!Validator.isValidPassword(pass)){
                     password.setError("Invalid Password");
                 }
@@ -100,16 +100,16 @@ public class MainActivity extends AppCompatActivity {
                     int radioId = userType.indexOfChild(radioButton);
                     RadioButton btn = (RadioButton) userType.getChildAt(radioId);
                     RadioSelection = (String) btn.getText();
-                    if(RadioSelection.matches("Patient")){
+                   /* if(RadioSelection.matches("Patient")){
                         Intent i=new Intent(getApplicationContext(), PatientDashboardActivity.class);
                         startActivity(i);
                     }else if(RadioSelection.matches("Doctor")){
                         Intent i=new Intent(getApplicationContext(), DoctorDashboardActivity.class);
                         startActivity(i);
-                    }
+                    }*/
                 }
 
-                /*String url="http://ec2-54-67-123-247.us-west-1.compute.amazonaws.com/api/auth/signin";
+                String url="http://ec2-54-67-123-247.us-west-1.compute.amazonaws.com/api/auth/signin";
                 StringRequest postRequest=new StringRequest(Request.Method.POST, url, new Response.Listener<String>() {
                     @Override
                     public void onResponse(String response) {
@@ -135,8 +135,8 @@ public class MainActivity extends AppCompatActivity {
                     {
                         Map<String, String> params = new HashMap<>();
                         // the POST parameters:
-                        params.put("username", "testuser");
-                        params.put("password", "Qwerty123$");
+                        params.put("username", emailid);
+                        params.put("password", pass);
                         return params;
                     }
                 };
@@ -145,7 +145,7 @@ public class MainActivity extends AppCompatActivity {
 
                 Volley.newRequestQueue(getApplicationContext()).add(postRequest);
 
-*/
+
 
             }
         });

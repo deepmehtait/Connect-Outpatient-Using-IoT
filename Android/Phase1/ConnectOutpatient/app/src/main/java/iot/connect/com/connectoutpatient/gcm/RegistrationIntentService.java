@@ -42,13 +42,13 @@ public class RegistrationIntentService extends IntentService {
     private void sendRegistrationToServer(String token) {
         final String tk=token;
         // Add custom implementation, as needed.
-        new Handler().post(new Runnable() {
+        /*new Handler().post(new Runnable() {
             @Override
             public void run() {
                 // Code here will run in UI thread
-                Toast.makeText(RegistrationIntentService.this, tk, Toast.LENGTH_SHORT).show();
+               // Toast.makeText(RegistrationIntentService.this, tk, Toast.LENGTH_SHORT).show();
             }
-        });
+        });*/
 
     }
 }
