@@ -14,13 +14,28 @@ import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.RadioButton;
+import android.widget.RadioGroup;
 import android.widget.Toast;
 
 
+import com.android.volley.Request;
+import com.android.volley.Response;
+import com.android.volley.VolleyError;
+import com.android.volley.toolbox.StringRequest;
+import com.android.volley.toolbox.Volley;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GoogleApiAvailability;
 
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import java.util.HashMap;
+import java.util.Map;
+
 import iot.connect.com.connectoutpatient.R;
+import iot.connect.com.connectoutpatient.activity.doctor.DoctorDashboardActivity;
+import iot.connect.com.connectoutpatient.activity.patient.PatientDashboardActivity;
 import iot.connect.com.connectoutpatient.gcm.RegistrationIntentService;
 import iot.connect.com.connectoutpatient.utils.AppStatus;
 import iot.connect.com.connectoutpatient.utils.ReadPhoneStatePermissionHandle;
@@ -35,6 +50,7 @@ public class MainActivity extends AppCompatActivity {
     private static final String TAG = "MainActivity";
     Button login,noAccount;
     EditText emailID,password;
+    RadioGroup userType;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -57,6 +73,8 @@ public class MainActivity extends AppCompatActivity {
             getUUID();
             //return UUID;
         }
+        // Radio Group
+        userType=(RadioGroup)findViewById(R.id.login_RG);
         // Buttons
         login=(Button)findViewById(R.id.btn_login);
         noAccount=(Button)findViewById(R.id.btn_signup);
@@ -75,12 +93,65 @@ public class MainActivity extends AppCompatActivity {
                 if(!Validator.isValidPassword(pass)){
                     password.setError("Invalid Password");
                 }
-                Intent i=new Intent(getApplicationContext(),GraphActivity.class);
-                startActivity(i);
+                String RadioSelection = new String();
+                if(userType.getCheckedRadioButtonId()!=-1){
+                    int id=userType.getCheckedRadioButtonId();
+                    View radioButton=userType.findViewById(id);
+                    int radioId = userType.indexOfChild(radioButton);
+                    RadioButton btn = (RadioButton) userType.getChildAt(radioId);
+                    RadioSelection = (String) btn.getText();
+                    if(RadioSelection.matches("Patient")){
+                        Intent i=new Intent(getApplicationContext(), PatientDashboardActivity.class);
+                        startActivity(i);
+                    }else if(RadioSelection.matches("Doctor")){
+                        Intent i=new Intent(getApplicationContext(), DoctorDashboardActivity.class);
+                        startActivity(i);
+                    }
+                }
 
+                /*String url="http://ec2-54-67-123-247.us-west-1.compute.amazonaws.com/api/auth/signin";
+                StringRequest postRequest=new StringRequest(Request.Method.POST, url, new Response.Listener<String>() {
+                    @Override
+                    public void onResponse(String response) {
+                        try {
+                            JSONObject jsonResponse = new JSONObject(response);
+                            String site = jsonResponse.toString();
+                            Toast.makeText(getApplicationContext(),site,Toast.LENGTH_SHORT).show();
+
+                        } catch (JSONException e) {
+                            e.printStackTrace();
+                        }
+                    }
+
+                },
+                        new Response.ErrorListener(){
+                            @Override
+                            public void onErrorResponse(VolleyError error) {
+                                error.printStackTrace();
+                            }
+                        }){
+                    @Override
+                    protected Map<String, String> getParams()
+                    {
+                        Map<String, String> params = new HashMap<>();
+                        // the POST parameters:
+                        params.put("username", "testuser");
+                        params.put("password", "Qwerty123$");
+                        return params;
+                    }
+                };
+
+
+
+                Volley.newRequestQueue(getApplicationContext()).add(postRequest);
+
+*/
 
             }
         });
+
+
+
         //  Signup Handle
         noAccount.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -95,36 +166,11 @@ public class MainActivity extends AppCompatActivity {
        // ReadPhoneStatePermissionHandle rpsph=new ReadPhoneStatePermissionHandle(this,MainActivity.class);
         //String UID=rpsph.getDeviceUUID();
         //Toast t1=Toast.makeText(this,UUID,Toast.LENGTH_SHORT);
-        if(AppStatus.getInstance(this).isOnline()) {
-
-            Toast t = Toast.makeText(this, "You are online!!!!", Toast.LENGTH_SHORT);
-            t.show();
-           /* AlertDialog.Builder builder = new AlertDialog.Builder(this);
-            builder.setMessage("Internet Connectivity!")
-                    .setCancelable(false)
-                    .setPositiveButton("OK", new DialogInterface.OnClickListener() {
-                        public void onClick(DialogInterface dialog, int id) {
-                            //do things
-                        }
-                    });
-            AlertDialog alert = builder.create();
-            alert.show();*/
-
-        } else {
+        if(!(AppStatus.getInstance(this).isOnline())) {
 
             Toast t = Toast.makeText(this, "You are not online!!!!", Toast.LENGTH_SHORT);
             t.show();
-            AlertDialog.Builder builder = new AlertDialog.Builder(this);
-            builder.setMessage("No Internet Connectivity!")
-                    .setCancelable(false)
-                    .setPositiveButton("OK", new DialogInterface.OnClickListener() {
-                        public void onClick(DialogInterface dialog, int id) {
-                            //do things
-                        }
-                    });
-            AlertDialog alert = builder.create();
-            alert.show();
-            Log.v("Home", "############################You are not online!!!!");
+
         }
 
     }

@@ -23,7 +23,23 @@
         <activity android:name=".activity.GraphActivity">
 
         </activity>
+        <!-- Doctor Activity list-->
+        <activity android:name=".activity.doctor.DoctorDashboardActivity">
 
+        </activity>
+        <activity android:name=".activity.doctor.DoctorMyPatientListActivity">
+
+        </activity>
+        <activity android:name=".activity.doctor.DoctorSettingsActivity">
+
+        </activity>
+        <!-- Paitent Activity List -->
+        <activity android:name=".activity.patient.PatientDashboardActivity">
+
+        </activity>
+        <activity android:name=".activity.patient.PatientSettingsActivity">
+
+        </activity>
         <!--Registration Service-->
         <service android:name=".gcm.RegistrationIntentService" android:exported="false"/>
         <!--Instance ID listner -->
