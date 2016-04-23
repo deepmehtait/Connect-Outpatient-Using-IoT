@@ -118,7 +118,7 @@ public class SignUpActivity extends AppCompatActivity {
                 //Log.d("JSONOBJECT", js.toString());
 
                 // Register User
-               String url="http://ec2-54-67-123-247.us-west-1.compute.amazonaws.com/api/auth/signup";
+               String url="http://52.8.186.40/api/auth/signup";
                 JSONObject jsonObject;
                 JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(Request.Method.POST, url,
                         js, new Response.Listener<JSONObject>() {
@@ -133,7 +133,14 @@ public class SignUpActivity extends AppCompatActivity {
                         // Log.d("Error.Response", error.getMessage());
                     }
                 }
-                );
+                ){
+                    @Override
+                    public Map<String, String> getHeaders() throws AuthFailureError {
+                        HashMap<String, String> headers = new HashMap<String, String>();
+                        headers.put("Content-Type", "application/json; charset=utf-8");
+                        return headers;
+                    }
+                };
                 Volley.newRequestQueue(getApplicationContext()).add(jsonObjectRequest);
                 /* StringRequest postRequest=new StringRequest(Request.Method.POST, url, new JSONObject(),new Response.Listener<String>() {
                     @Override

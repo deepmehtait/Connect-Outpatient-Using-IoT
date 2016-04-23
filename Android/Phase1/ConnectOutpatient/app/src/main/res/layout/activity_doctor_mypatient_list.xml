@@ -22,12 +22,12 @@
 
         </android.support.v7.widget.Toolbar>
         <!-- Main Content -->
-        <TextView
-            android:layout_width="wrap_content"
+        <ListView
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="My Patient List"
-            android:gravity="center"
-            />
+            android:id="@+id/mypatientListView">
+
+        </ListView>
 
     </LinearLayout>
 
