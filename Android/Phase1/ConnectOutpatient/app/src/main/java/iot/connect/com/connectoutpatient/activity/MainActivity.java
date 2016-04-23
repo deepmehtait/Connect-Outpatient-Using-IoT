@@ -7,6 +7,7 @@ import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.os.Build;
 import android.os.Bundle;
+import android.support.design.widget.Snackbar;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.telephony.TelephonyManager;
@@ -167,6 +168,7 @@ public class MainActivity extends AppCompatActivity {
         //String UID=rpsph.getDeviceUUID();
         //Toast t1=Toast.makeText(this,UUID,Toast.LENGTH_SHORT);
         if(!(AppStatus.getInstance(this).isOnline())) {
+
 
             Toast t = Toast.makeText(this, "You are not online!!!!", Toast.LENGTH_SHORT);
             t.show();
