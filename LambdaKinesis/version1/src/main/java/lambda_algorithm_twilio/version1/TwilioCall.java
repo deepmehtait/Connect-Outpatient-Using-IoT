@@ -16,7 +16,7 @@ public class TwilioCall {
  
  public void callTwilio(String contactNumber) throws TwilioRestException { 
 	TwilioRestClient client = new TwilioRestClient(ACCOUNT_SID, AUTH_TOKEN); 
-
+	System.out.println("In Twilio Call");
 	List<NameValuePair> params = new ArrayList<NameValuePair>(); 
 	params.add(new BasicNameValuePair("To", contactNumber)); 
 	params.add(new BasicNameValuePair("From", "+18442932272")); 

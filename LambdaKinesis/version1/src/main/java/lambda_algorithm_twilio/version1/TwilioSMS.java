@@ -15,7 +15,7 @@ public class TwilioSMS {
  
  public void messageTwilio(String contactNumber) throws TwilioRestException { 
 	TwilioRestClient client = new TwilioRestClient(ACCOUNT_SID, AUTH_TOKEN); 
- 
+	 System.out.println("In Twilio SMS");
 	 List<NameValuePair> params = new ArrayList<NameValuePair>(); 
 	 params.add(new BasicNameValuePair("To", contactNumber)); 
 	 params.add(new BasicNameValuePair("From", "+18442932272")); 

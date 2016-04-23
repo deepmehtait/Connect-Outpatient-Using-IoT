@@ -4,7 +4,8 @@ import com.twilio.sdk.TwilioRestException;
 
 public class TriggerTwilio {
 	public static void process(String record){
-		if(record.equalsIgnoreCase("72")){
+		try {
+			if(record.equalsIgnoreCase("72")){
 			TwilioCall twilioCall = new TwilioCall();
 	        try {
 				twilioCall.callTwilio("+14087149328");
@@ -20,6 +21,11 @@ public class TriggerTwilio {
 				System.out.println("Twilio Message Exception");
 				e.printStackTrace();
 			}
+			}
 		}
+		catch (Exception e) {
+			System.out.println("Data Value Exception");
+	        e.printStackTrace();
 	}
+}
 }
