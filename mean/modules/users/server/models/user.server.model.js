@@ -98,7 +98,17 @@ var UserSchema = new Schema({
   resetPasswordExpires: {
     type: Date
   },
-  patients:{}
+  patients:{},
+
+  fitbitUsername: {
+    type: String,
+    trim: true
+  },
+
+  phoneNumber: {
+    type: String,
+    trim: true
+  }
 
 });
 
