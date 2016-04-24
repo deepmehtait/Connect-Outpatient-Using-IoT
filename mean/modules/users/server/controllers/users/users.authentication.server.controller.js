@@ -20,7 +20,7 @@ var noReturnUrls = [
  */
 exports.signup = function (req, res) {
   // For security measurement we remove the roles from the req.body object
-  delete req.body.roles;
+  //delete req.body.roles;
 
   // Init Variables
   var user = new User(req.body);
@@ -45,7 +45,7 @@ exports.signup = function (req, res) {
         if (err) {
           res.status(400).send(err);
         } else {
-          res.json(user);
+          res.json({ 'message' : 'Success', 'data': user });
         }
       });
     }
@@ -68,7 +68,7 @@ exports.signin = function (req, res, next) {
         if (err) {
           res.status(400).send(err);
         } else {
-          res.json(user);
+          res.json({ 'message': 'Success', 'data': user });
         }
       });
     }
