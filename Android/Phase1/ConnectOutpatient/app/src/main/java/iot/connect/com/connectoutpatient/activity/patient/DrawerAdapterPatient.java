@@ -62,8 +62,13 @@ import iot.connect.com.connectoutpatient.R;
 
                 String rowText = rows.get(location);
                 holder.textView.setText(rowText);
-                Picasso.with(context).load(R.drawable.ic_settings_black_24dp).into(holder.imageView);
+                Picasso.with(context).load("https://cdn1.iconfinder.com/data/icons/complete-medical-healthcare-icons-for-apps-and-web/128/medication-drugs1-512.png").into(holder.imageView);
 
+            }
+            else if(location==2){
+                String rowText = rows.get(location);
+                holder.textView.setText(rowText);
+                Picasso.with(context).load(R.drawable.ic_settings_black_24dp).into(holder.imageView);
             }
         }
     }
@@ -108,6 +113,11 @@ import iot.connect.com.connectoutpatient.R;
                             i.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
                             itemView.getContext().startActivity(i);
                         }else if(position==1){
+                            Intent i=new Intent(itemView.getContext(),PatientMedication.class);
+                            i.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+                            itemView.getContext().startActivity(i);
+                        }
+                        else if(position ==2){
                             Intent i=new Intent(itemView.getContext(),PatientSettingsActivity.class);
                             i.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
                             itemView.getContext().startActivity(i);

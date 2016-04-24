@@ -13,13 +13,13 @@ public class TwilioSMS {
  public static final String ACCOUNT_SID = "AC1455ee0bbd738e954a909af61ecd1139"; 
  public static final String AUTH_TOKEN = "68f23912666fdd213738678e35742e71"; 
  
- public void messageTwilio(String contactNumber) throws TwilioRestException { 
+ public void messageTwilio(String contactNumber, String sensorID, String value) throws TwilioRestException { 
 	TwilioRestClient client = new TwilioRestClient(ACCOUNT_SID, AUTH_TOKEN); 
 	 System.out.println("In Twilio SMS");
 	 List<NameValuePair> params = new ArrayList<NameValuePair>(); 
 	 params.add(new BasicNameValuePair("To", contactNumber)); 
 	 params.add(new BasicNameValuePair("From", "+18442932272")); 
-	 params.add(new BasicNameValuePair("Body", "Your heart rate has reached beyond the threshold."));   
+	 params.add(new BasicNameValuePair("Body", "Hi " + sensorID + "! Your heart rate is " + value + ".It has reached beyond the threshold."));   
  
 	 MessageFactory messageFactory = client.getAccount().getMessageFactory(); 
 	 Message message = messageFactory.create(params); 

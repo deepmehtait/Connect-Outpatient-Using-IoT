@@ -40,6 +40,10 @@
         <activity android:name=".activity.patient.PatientSettingsActivity">
 
         </activity>
+        <activity android:name=".activity.patient.PatientMedication">
+
+        </activity>
+
         <!--Registration Service-->
         <service android:name=".gcm.RegistrationIntentService" android:exported="false"/>
         <!--Instance ID listner -->
