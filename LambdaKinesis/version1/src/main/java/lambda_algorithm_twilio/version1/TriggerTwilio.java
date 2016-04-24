@@ -3,12 +3,12 @@ package lambda_algorithm_twilio.version1;
 import com.twilio.sdk.TwilioRestException;
 
 public class TriggerTwilio {
-	public static void process(String record){
+	public static void process(String record, String sensorID){
 		try {
 			if(record.equalsIgnoreCase("72")){
 			TwilioCall twilioCall = new TwilioCall();
 	        try {
-				twilioCall.callTwilio("+14087149328");
+				twilioCall.callTwilio("+14087149328", sensorID, record);
 			} catch (TwilioRestException e) {
 				System.out.println("Twilio Call Exception");
 				e.printStackTrace();
@@ -16,7 +16,7 @@ public class TriggerTwilio {
 	        
 	        TwilioSMS twilioSms = new TwilioSMS();
 	        try {
-				twilioSms.messageTwilio("+14087149328");
+				twilioSms.messageTwilio("+14087149328", sensorID, record);
 			} catch (TwilioRestException e) {
 				System.out.println("Twilio Message Exception");
 				e.printStackTrace();
