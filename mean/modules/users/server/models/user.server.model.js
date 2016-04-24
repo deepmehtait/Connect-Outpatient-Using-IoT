@@ -108,6 +108,16 @@ var UserSchema = new Schema({
   phoneNumber: {
     type: String,
     trim: true
+  },
+
+  emergencyContactName: {
+    type: String,
+    trim: true
+  },
+
+  emergencyContactNumber: {
+    type: String,
+    trim : true
   }
 
 });

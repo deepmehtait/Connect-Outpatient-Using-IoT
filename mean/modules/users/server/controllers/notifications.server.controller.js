@@ -13,7 +13,7 @@ var path = require('path'),
  *  Store notification information and send a Notification
  */
 exports.sendNotification = function (req, res) {
-  User.findOne({ 'fitbitUsername' : req.body.fitBitId },'username displayName', function (err,userData) {
+  User.findOne({ 'fitbitUsername' : req.body.fitBitId },'username displayName emergencyContactName emergencyContactNumber', function (err,userData) {
     if (err) {
       return res.status(400).send({
         message: errorHandler.getErrorMessage(err)
@@ -38,7 +38,7 @@ exports.sendNotification = function (req, res) {
           Notifications.update({ username: userData.username },
                       { $set:{ username: userData.username ,
                       fitbitUsername: req.body.fitBitId,
-                      'doctorId': doctorIds } }, { upsert: true } ,function(err3, data) {
+                      doctorId : doctorIds }, $push: { 'events' : { 'time': new Date() , 'value': req.body.value } } }, { upsert: true } ,function(err3, data) {
                         if (err3) {
                           return res.status(400).send({
                             message: errorHandler.getErrorMessage(err3)
