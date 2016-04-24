@@ -63,7 +63,7 @@ import iot.connect.com.connectoutpatient.activity.patient.PatientSettingsActivit
             }else if(location==1){
                 String rowText = rows.get(location);
                 holder.textView.setText(rowText);
-                Picasso.with(context).load(R.mipmap.ic_launcher).into(holder.imageView);
+                Picasso.with(context).load(R.drawable.ic_people_black_24dp).into(holder.imageView);
 
 
             }else if(location==2){

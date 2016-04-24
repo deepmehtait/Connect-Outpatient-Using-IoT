@@ -35,6 +35,7 @@ public class PatientDashboardActivity extends AppCompatActivity {
         setTitle("Patient Dashboard");
         List<String> rows = new ArrayList<>();
         rows.add("Dashboard");
+        rows.add("My Medications");
         rows.add("Settings");
         DrawerAdapterPatient drawerAdapter = new DrawerAdapterPatient(getApplicationContext(),rows,"deep@gmail.com","https:");
         recyclerView.setAdapter(drawerAdapter);
