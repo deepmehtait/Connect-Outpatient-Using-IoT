@@ -4,6 +4,7 @@ import android.Manifest;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.os.Build;
 import android.os.Bundle;
@@ -20,13 +21,16 @@ import android.widget.RadioGroup;
 import android.widget.Toast;
 
 
+import com.android.volley.AuthFailureError;
 import com.android.volley.Request;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
+import com.android.volley.toolbox.JsonObjectRequest;
 import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GoogleApiAvailability;
+import com.google.gson.Gson;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -38,6 +42,8 @@ import iot.connect.com.connectoutpatient.R;
 import iot.connect.com.connectoutpatient.activity.doctor.DoctorDashboardActivity;
 import iot.connect.com.connectoutpatient.activity.patient.PatientDashboardActivity;
 import iot.connect.com.connectoutpatient.gcm.RegistrationIntentService;
+import iot.connect.com.connectoutpatient.modals.SignIn;
+import iot.connect.com.connectoutpatient.utils.AppBaseURL;
 import iot.connect.com.connectoutpatient.utils.AppStatus;
 import iot.connect.com.connectoutpatient.utils.ReadPhoneStatePermissionHandle;
 import iot.connect.com.connectoutpatient.utils.Validator;
@@ -52,11 +58,13 @@ public class MainActivity extends AppCompatActivity {
     Button login,noAccount;
     EditText emailID,password;
     RadioGroup userType;
+    SharedPreferences sharedpreferences;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
+        sharedpreferences = getSharedPreferences("ConnectIoT", getApplicationContext().MODE_PRIVATE);
         if (checkPlayServices()) {
             // Start IntentService to register this application with GCM.
             Intent intent = new Intent(this, RegistrationIntentService.class);
@@ -87,9 +95,9 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 final String emailid=emailID.getText().toString();
-                if(!Validator.isValidEmail(emailid)){
+                /*if(!Validator.isValidEmail(emailid)){
                     emailID.setError("Invalid Email");
-                }
+                }*/
                 final String pass=password.getText().toString();
                 if(!Validator.isValidPassword(pass)){
                     password.setError("Invalid Password");
@@ -101,52 +109,81 @@ public class MainActivity extends AppCompatActivity {
                     int radioId = userType.indexOfChild(radioButton);
                     RadioButton btn = (RadioButton) userType.getChildAt(radioId);
                     RadioSelection = (String) btn.getText();
-                    if(RadioSelection.matches("Patient")){
+                    /*if(RadioSelection.matches("Patient")){
                         Intent i=new Intent(getApplicationContext(), PatientDashboardActivity.class);
                         startActivity(i);
                     }else if(RadioSelection.matches("Doctor")){
                         Intent i=new Intent(getApplicationContext(), DoctorDashboardActivity.class);
                         startActivity(i);
-                    }
+                    }*/
                 }
+                JSONObject obj=new JSONObject();
+                try{
+                    obj.put("username",emailid);
+                    obj.put("password",pass);
 
-                /*String url="http://ec2-54-67-123-247.us-west-1.compute.amazonaws.com/api/auth/signin";
-                StringRequest postRequest=new StringRequest(Request.Method.POST, url, new Response.Listener<String>() {
+                }catch(JSONException e){
+                    e.printStackTrace();
+                }
+                Log.d("Request=",obj.toString());
+                String url= AppBaseURL.BaseURL+"api/auth/signin";
+                JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(Request.Method.POST, url,
+                        obj, new Response.Listener<JSONObject>() {
                     @Override
-                    public void onResponse(String response) {
-                        try {
-                            JSONObject jsonResponse = new JSONObject(response);
-                            String site = jsonResponse.toString();
-                            Toast.makeText(getApplicationContext(),site,Toast.LENGTH_SHORT).show();
-
-                        } catch (JSONException e) {
+                    public void onResponse(JSONObject jsonObject) {
+                        Log.d("Response", jsonObject.toString());
+                        Toast.makeText(getApplicationContext(),jsonObject.toString(),Toast.LENGTH_SHORT).show();
+                        SignIn signIn=new SignIn();
+                        Gson gs=new Gson();
+                        String msg=new String();
+                        try{
+                            msg=jsonObject.getString("message");
+                        }catch (JSONException e){
                             e.printStackTrace();
                         }
-                    }
-
-                },
-                        new Response.ErrorListener(){
-                            @Override
-                            public void onErrorResponse(VolleyError error) {
-                                error.printStackTrace();
+                        if(msg.matches("Success")){
+                            try{
+                                signIn=gs.fromJson(jsonObject.getJSONObject("data").toString(),SignIn.class);
+                            }catch (JSONException e){
+                                e.printStackTrace();
                             }
-                        }){
+                            String role=signIn.getRoles().get(0).toString();
+                            String username=signIn.getUsername();
+                            String profilepic=AppBaseURL.BaseURL+signIn.getProfileImageURL();
+                            String email=signIn.getEmail();
+                            SharedPreferences.Editor editor = sharedpreferences.edit();
+                            editor.putString("role",role);
+                            editor.putString("username",username);
+                            editor.putString("profilepic",profilepic);
+                            editor.putString("email",email);
+                            editor.putString("LoggedIn","true");
+                            editor.commit();
+
+                            if(role.matches("patient")){
+                                Intent i=new Intent(getApplicationContext(), PatientDashboardActivity.class);
+                                startActivity(i);
+                            }else if(role.matches("doctor")){
+                                Intent i=new Intent(getApplicationContext(), DoctorDashboardActivity.class);
+                                startActivity(i);
+                            }
+                           // Toast.makeText(getApplicationContext(),signIn.getRoles().get(0).toString(),Toast.LENGTH_LONG).show();
+                        }
+                    }
+                }, new Response.ErrorListener() {
                     @Override
-                    protected Map<String, String> getParams()
-                    {
-                        Map<String, String> params = new HashMap<>();
-                        // the POST parameters:
-                        params.put("username", emailid);
-                        params.put("password", pass);
-                        return params;
+                    public void onErrorResponse(VolleyError error) {
+                        Log.d("Error.Response", error.getMessage());
+                    }
+                }
+                ){
+                    @Override
+                    public Map<String, String> getHeaders() throws AuthFailureError {
+                        HashMap<String, String> headers = new HashMap<String, String>();
+                        headers.put("Content-Type", "application/json; charset=utf-8");
+                        return headers;
                     }
                 };
-
-
-
-                Volley.newRequestQueue(getApplicationContext()).add(postRequest);*/
-
-
+                Volley.newRequestQueue(getApplicationContext()).add(jsonObjectRequest);
 
             }
         });
@@ -200,7 +237,12 @@ public class MainActivity extends AppCompatActivity {
         String UUID=new String();
         TelephonyManager tManager = (TelephonyManager)getSystemService(Context.TELEPHONY_SERVICE);
         UUID=tManager.getDeviceId();
+        sharedpreferences = getSharedPreferences("ConnectIoT", getApplicationContext().MODE_PRIVATE);
+        SharedPreferences.Editor editor = sharedpreferences.edit();
+        editor.putString("UUID",UUID);
+        editor.commit();
         Log.d("UUID= ", UUID);
+        Log.d("UUID from shared pref",sharedpreferences.getString("UUID"," no key"));
         return UUID;
     }
 

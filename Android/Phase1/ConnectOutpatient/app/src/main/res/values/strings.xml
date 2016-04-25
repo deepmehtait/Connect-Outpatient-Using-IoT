@@ -4,7 +4,7 @@
     <string name="login">Login</string>
     <string name="NoAccount">No account yet? Create one</string>
     <string name="doctor">Doctor</string>
-    <string name="paitent">Paitent</string>
+    <string name="paitent">Patient</string>
     <string name="ConfirmPassword">Confirm Password</string>
     <string name="Password">Password</string>
     <string name="email">Email</string>

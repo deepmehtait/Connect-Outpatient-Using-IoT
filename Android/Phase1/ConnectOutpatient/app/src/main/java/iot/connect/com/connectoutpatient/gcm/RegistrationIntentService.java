@@ -2,6 +2,7 @@ package iot.connect.com.connectoutpatient.gcm;
 
 import android.app.IntentService;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Handler;
 import android.util.Log;
 import android.widget.Toast;
@@ -19,6 +20,7 @@ import iot.connect.com.connectoutpatient.R;
 public class RegistrationIntentService extends IntentService {
     // abbreviated tag name
     private static final String TAG = "RegIntentService";
+    SharedPreferences sharedpreferences;
     public RegistrationIntentService() {
         super(TAG);
     }
@@ -41,6 +43,11 @@ public class RegistrationIntentService extends IntentService {
 
     private void sendRegistrationToServer(String token) {
         final String tk=token;
+        sharedpreferences = getSharedPreferences("ConnectIoT", getApplicationContext().MODE_PRIVATE);
+        SharedPreferences.Editor editor = sharedpreferences.edit();
+        editor.putString("token",token);
+        editor.commit();
+
         // Add custom implementation, as needed.
         /*new Handler().post(new Runnable() {
             @Override
