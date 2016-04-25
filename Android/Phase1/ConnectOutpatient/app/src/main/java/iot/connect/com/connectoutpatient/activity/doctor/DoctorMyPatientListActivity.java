@@ -8,13 +8,27 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.widget.ListView;
+
+import com.android.volley.Request;
+import com.android.volley.Response;
+import com.android.volley.VolleyError;
+import com.android.volley.toolbox.JsonObjectRequest;
+import com.android.volley.toolbox.Volley;
+import com.google.gson.Gson;
+
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import java.util.ArrayList;
 import java.util.List;
 
 import iot.connect.com.connectoutpatient.R;
 import iot.connect.com.connectoutpatient.activity.doctor.adapter.DoctorMyPatientAdapter;
+import iot.connect.com.connectoutpatient.modals.MyPatientList;
+import iot.connect.com.connectoutpatient.modals.MyPatientListDetails;
+import iot.connect.com.connectoutpatient.utils.AppBaseURL;
 
 /**
  * Created by Deep on 19-Apr-16.
@@ -46,7 +60,38 @@ public class DoctorMyPatientListActivity extends AppCompatActivity {
         recyclerView.setAdapter(drawerAdapter);
         recyclerView.setHasFixedSize(true);
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
-        ArrayList<String> name=new ArrayList<String>();
+
+        String URL= AppBaseURL.BaseURL+"doctor/patients/johndoe";
+        JsonObjectRequest jsonRequest = new JsonObjectRequest(Request.Method.GET, URL, (JSONObject) null, new Response.Listener<JSONObject>() {
+
+            @Override
+            public void onResponse(JSONObject response) {
+                // the response is already constructed as a JSONObject!
+                Log.d("Response-",response.toString());
+                MyPatientList mPL=new MyPatientList();
+                Gson gs=new Gson();
+                mPL=gs.fromJson(response.toString(),MyPatientList.class);
+
+                if(mPL.getMessage().matches("Success")){
+                    ArrayList<MyPatientListDetails> mpld=new ArrayList<MyPatientListDetails>(mPL.getData());
+                    mypatientList.setAdapter(new DoctorMyPatientAdapter(getApplicationContext(),mpld));
+                }
+
+            }
+        }, new Response.ErrorListener() {
+
+            @Override
+            public void onErrorResponse(VolleyError error) {
+
+                error.printStackTrace();
+            }
+        });
+
+        Volley.newRequestQueue(getApplicationContext()).add(jsonRequest);
+
+
+
+        /*ArrayList<String> name=new ArrayList<String>();
         name.add("Patient 1");
         name.add("Patient 2");
         name.add("Patient 3");
@@ -72,7 +117,7 @@ public class DoctorMyPatientListActivity extends AppCompatActivity {
         url.add("http://52.8.186.40/modules/users/client/img/profile/default.png");
         url.add("http://handh.headlinesandhero.netdna-cdn.com/wordP/wp-content/uploads/2015/11/Andreea-Cristina1.jpg");
         url.add("http://www.famousbirthdays.com/faces/cerny-amanda-image.jpg");
-        mypatientList.setAdapter(new DoctorMyPatientAdapter(getApplicationContext(),name,url));
+        mypatientList.setAdapter(new DoctorMyPatientAdapter(getApplicationContext(),name,url));*/
 
     }
 }

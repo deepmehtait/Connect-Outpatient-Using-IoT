@@ -130,7 +130,7 @@ public class SignUpActivity extends AppCompatActivity {
                 }, new Response.ErrorListener() {
                     @Override
                     public void onErrorResponse(VolleyError error) {
-                        // Log.d("Error.Response", error.getMessage());
+                        Log.d("Error.Response", error.getMessage());
                     }
                 }
                 ){
