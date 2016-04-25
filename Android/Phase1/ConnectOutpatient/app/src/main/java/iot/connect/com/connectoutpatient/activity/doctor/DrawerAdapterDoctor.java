@@ -50,7 +50,7 @@ import iot.connect.com.connectoutpatient.activity.patient.PatientSettingsActivit
     @Override
     public void onBindViewHolder(ViewHolder holder, int position) {
         if(holder.viewType==HEADER_TYPE){
-            Picasso.with(context).load(R.mipmap.ic_launcher).into(holder.headerImageView);
+            Picasso.with(context).load(userImageUrl).error(R.drawable.noimg).into(holder.headerImageView);
             holder.headerTextView.setText(userName);
         }
         if (holder.viewType == ROW_TYPE) {

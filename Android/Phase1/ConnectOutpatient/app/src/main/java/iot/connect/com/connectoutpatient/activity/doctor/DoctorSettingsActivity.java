@@ -1,5 +1,6 @@
 package iot.connect.com.connectoutpatient.activity.doctor;
 
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.widget.DrawerLayout;
@@ -22,11 +23,13 @@ public class DoctorSettingsActivity extends AppCompatActivity {
     DrawerLayout drawerLayout;
     Toolbar toolbar;
     RecyclerView recyclerView;
+    SharedPreferences sharedpreferences;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_doctor_settings);
+        sharedpreferences = getSharedPreferences("ConnectIoT", getApplicationContext().MODE_PRIVATE);
         toolbar = (Toolbar) findViewById(R.id.toolbar);
         drawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
         recyclerView = (RecyclerView) findViewById(R.id.drawer_recyclerView);
@@ -39,7 +42,11 @@ public class DoctorSettingsActivity extends AppCompatActivity {
         rows.add("Dashboard");
         rows.add("My Patients");
         rows.add("Settings");
-        DrawerAdapterDoctor drawerAdapter = new DrawerAdapterDoctor(getApplicationContext(), rows, "Doctor@gmail.com", "https:");
+
+        String email=sharedpreferences.getString("email","");
+        String pic=sharedpreferences.getString("profilepic","http://www.sourcecoi.com/sites/default/files/team/defaultpic_0.png");
+        DrawerAdapterDoctor drawerAdapter = new DrawerAdapterDoctor(getApplicationContext(), rows, email, pic);
+
         recyclerView.setAdapter(drawerAdapter);
         recyclerView.setHasFixedSize(true);
         recyclerView.setLayoutManager(new LinearLayoutManager(this));

@@ -18,7 +18,7 @@ public class SplashActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        /*sharedpreferences = getSharedPreferences("ConnectIoT", getApplicationContext().MODE_PRIVATE);
+        sharedpreferences = getSharedPreferences("ConnectIoT", getApplicationContext().MODE_PRIVATE);
         String isLoggedIn=sharedpreferences.getString("LoggedIn","Null");
         if(isLoggedIn.matches("true")){
             String role=sharedpreferences.getString("role","null");
@@ -35,9 +35,9 @@ public class SplashActivity extends AppCompatActivity {
             Intent intent = new Intent(this, MainActivity.class);
             startActivity(intent);
             finish();
-        }*/
-        Intent intent = new Intent(this, DoctorMyPatientListActivity.class);
-        startActivity(intent);
+        }
+        /*Intent intent = new Intent(this, DoctorMyPatientListActivity.class);
+        startActivity(intent);*/
 
     }
 }

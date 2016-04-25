@@ -72,7 +72,7 @@ public class PatientDashboardActivity extends AppCompatActivity {
 
 
         //Register Token
-        String username=sharedpreferences.getString("username","");
+        /*String username=sharedpreferences.getString("username","");
         String UUID=sharedpreferences.getString("UUID","null");
         String token=sharedpreferences.getString("token","null");
         JSONObject obj=new JSONObject();
@@ -108,7 +108,7 @@ public class PatientDashboardActivity extends AppCompatActivity {
                 return headers;
             }
         };
-        Volley.newRequestQueue(getApplicationContext()).add(jsonObjectRequest);
+        Volley.newRequestQueue(getApplicationContext()).add(jsonObjectRequest);*/
 
     }
 }

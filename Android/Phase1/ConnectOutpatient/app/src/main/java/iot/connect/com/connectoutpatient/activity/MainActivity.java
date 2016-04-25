@@ -47,7 +47,7 @@ import iot.connect.com.connectoutpatient.utils.AppBaseURL;
 import iot.connect.com.connectoutpatient.utils.AppStatus;
 import iot.connect.com.connectoutpatient.utils.ReadPhoneStatePermissionHandle;
 import iot.connect.com.connectoutpatient.utils.Validator;
-
+import iot.connect.com.connectoutpatient.gcm.RegisterToken;
 /**
  * Created by Deep on 15-Jan-16.
  */
@@ -158,7 +158,9 @@ public class MainActivity extends AppCompatActivity {
                             editor.putString("email",email);
                             editor.putString("LoggedIn","true");
                             editor.commit();
-
+                            RegisterToken rt=new RegisterToken();
+                            rt.register(getApplicationContext());
+                            Log.d("Registration Complete","yea.!");
                             if(role.matches("patient")){
                                 Intent i=new Intent(getApplicationContext(), PatientDashboardActivity.class);
                                 startActivity(i);
