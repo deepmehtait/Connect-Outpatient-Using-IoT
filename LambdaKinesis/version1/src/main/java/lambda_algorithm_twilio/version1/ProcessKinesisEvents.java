@@ -2,8 +2,6 @@ package lambda_algorithm_twilio.version1;
 
 import java.io.IOException;
 
-import org.json.JSONException;
-
 import com.amazonaws.services.lambda.runtime.events.KinesisEvent;
 import com.amazonaws.services.lambda.runtime.events.KinesisEvent.KinesisEventRecord;
 
@@ -12,9 +10,10 @@ public class ProcessKinesisEvents {
         for(KinesisEventRecord rec : event.getRecords()) {
 //            JSONObject obj = new JSONObject(rec.getKinesis().getData().array());
             try{
-            	TriggerTwilio.process(new String(rec.getKinesis().getData().array()), new String(rec.getKinesis().getPartitionKey().toString()));
-            }catch(JSONException e){
-            	System.out.println("Error: " + new String(rec.getKinesis().getData().array()));
+            	TriggerWebNotification.process(new String(rec.getKinesis().getData().array()), new String(rec.getKinesis().getPartitionKey().toString()));
+            	
+            }catch(Exception e){
+            	System.out.println("Error Kinesis Event Processing: " + new String(rec.getKinesis().getData().array()));
             }
         }
     }
