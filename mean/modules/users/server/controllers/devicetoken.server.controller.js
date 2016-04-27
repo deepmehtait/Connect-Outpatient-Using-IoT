@@ -27,13 +27,17 @@ exports.addDeviceToken = function (req, res) {
  * Delete a Devicetoken
  */
 exports.deleteDeviceToken = function (req, res) {
-  DeviceToken.remove({ username : req.params.tokenUserId }, function (err) {
+  DeviceToken.remove({ $and: [ { username : req.params.tokenUserId } , { uuid: req.params.tokenUUID } ] }, function (err,data) {
+    console.log(data);
     if (err) {
       return res.status(400).send({
         message: errorHandler.getErrorMessage(err)
       });
-    } else {
+    } else if(data && data.result && data.result.n > 0){
       res.json({ 'Result': 'device token deleted successfully' });
+    }
+    else{
+      res.json({ 'Result': 'Record not found with given parameters' });
     }
   });
 };
