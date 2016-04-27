@@ -1,6 +1,7 @@
 package iot.connect.com.connectoutpatient.activity.doctor.adapter;
 
 import android.content.Context;
+import android.content.Intent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -14,6 +15,7 @@ import com.squareup.picasso.Picasso;
 import java.util.ArrayList;
 
 import iot.connect.com.connectoutpatient.R;
+import iot.connect.com.connectoutpatient.activity.doctor.DoctorPatientDetail;
 import iot.connect.com.connectoutpatient.modals.MyPatientListDetails;
 import iot.connect.com.connectoutpatient.utils.AppBaseURL;
 
@@ -72,6 +74,12 @@ public class DoctorMyPatientAdapter extends BaseAdapter {
             @Override
             public void onClick(View v) {
                 Toast.makeText(context,"Name-"+mpld.get(position).getDisplayName(),Toast.LENGTH_SHORT).show();
+                Intent i=new Intent(context, DoctorPatientDetail.class);
+                i.putExtra("patientName",mpld.get(position).getDisplayName());
+                i.putExtra("picURL",mpld.get(position).getProfileImageURL());
+                i.putExtra("id",mpld.get(position).getUsername());
+                i.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                context.startActivity(i);
             }
         });
         return row;
