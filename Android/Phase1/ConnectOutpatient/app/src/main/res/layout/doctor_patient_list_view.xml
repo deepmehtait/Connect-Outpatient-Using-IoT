@@ -9,8 +9,8 @@
         app:border_width="1dp"
         android:src="@mipmap/ic_launcher"
         android:id="@+id/patientImage"
-        android:layout_width="50dp"
-        android:layout_height="50dp"
+        android:layout_width="60dp"
+        android:layout_height="60dp"
         android:layout_margin="20dp">
 
     </de.hdodenhof.circleimageview.CircleImageView>

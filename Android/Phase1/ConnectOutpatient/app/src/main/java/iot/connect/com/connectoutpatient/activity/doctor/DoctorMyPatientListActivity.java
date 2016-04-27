@@ -12,6 +12,7 @@ import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.widget.ListView;
+import android.widget.Toast;
 
 import com.android.volley.Request;
 import com.android.volley.Response;
@@ -20,7 +21,6 @@ import com.android.volley.toolbox.JsonObjectRequest;
 import com.android.volley.toolbox.Volley;
 import com.google.gson.Gson;
 
-import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
@@ -31,6 +31,7 @@ import iot.connect.com.connectoutpatient.activity.doctor.adapter.DoctorMyPatient
 import iot.connect.com.connectoutpatient.modals.MyPatientList;
 import iot.connect.com.connectoutpatient.modals.MyPatientListDetails;
 import iot.connect.com.connectoutpatient.utils.AppBaseURL;
+import iot.connect.com.connectoutpatient.utils.AppStatus;
 
 /**
  * Created by Deep on 19-Apr-16.
@@ -68,33 +69,40 @@ public class DoctorMyPatientListActivity extends AppCompatActivity {
         recyclerView.setHasFixedSize(true);
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
 
-        String URL = AppBaseURL.BaseURL + "doctor/patients/johndoe";
-        JsonObjectRequest jsonRequest = new JsonObjectRequest(Request.Method.GET, URL, (JSONObject) null, new Response.Listener<JSONObject>() {
+        if (AppStatus.getInstance(getApplicationContext()).isOnline()) {
 
-            @Override
-            public void onResponse(JSONObject response) {
-                // the response is already constructed as a JSONObject!
-                Log.d("Response-", response.toString());
-                MyPatientList mPL = new MyPatientList();
-                Gson gs = new Gson();
-                mPL = gs.fromJson(response.toString(), MyPatientList.class);
 
-                if (mPL.getMessage().matches("Success")) {
-                    ArrayList<MyPatientListDetails> mpld = new ArrayList<MyPatientListDetails>(mPL.getData());
-                    mypatientList.setAdapter(new DoctorMyPatientAdapter(getApplicationContext(), mpld));
+            String URL = AppBaseURL.BaseURL + "doctor/patients/johndoe";
+            JsonObjectRequest jsonRequest = new JsonObjectRequest(Request.Method.GET, URL, (JSONObject) null, new Response.Listener<JSONObject>() {
+
+                @Override
+                public void onResponse(JSONObject response) {
+                    // the response is already constructed as a JSONObject!
+                    Log.d("Response-", response.toString());
+                    MyPatientList mPL = new MyPatientList();
+                    Gson gs = new Gson();
+                    mPL = gs.fromJson(response.toString(), MyPatientList.class);
+
+                    if (mPL.getMessage().matches("Success")) {
+                        ArrayList<MyPatientListDetails> mpld = new ArrayList<MyPatientListDetails>(mPL.getData());
+                        mypatientList.setAdapter(new DoctorMyPatientAdapter(getApplicationContext(), mpld));
+                    }
+
                 }
+            }, new Response.ErrorListener() {
 
-            }
-        }, new Response.ErrorListener() {
+                @Override
+                public void onErrorResponse(VolleyError error) {
 
-            @Override
-            public void onErrorResponse(VolleyError error) {
-
-                error.printStackTrace();
-            }
-        });
-
-        Volley.newRequestQueue(getApplicationContext()).add(jsonRequest);
+                    error.printStackTrace();
+                }
+            });
+            jsonRequest.setShouldCache(false);
+            Volley.newRequestQueue(getApplicationContext()).add(jsonRequest);
+        } else {
+            // If no network connectivity notify user
+            Toast.makeText(getApplicationContext(), "Please Check Internet Connection", Toast.LENGTH_SHORT).show();
+        }
     }
 
     // Handle back button event fired.

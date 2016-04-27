@@ -65,6 +65,40 @@ public class RegisterToken {
                 return headers;
             }
         };
+        jsonObjectRequest.setShouldCache(false);
+        Volley.newRequestQueue(context).add(jsonObjectRequest);
+    }
+
+    public void unRegister(final Context context){
+        // unregister
+        sharedpreferences = context.getSharedPreferences("ConnectIoT", context.MODE_PRIVATE);
+        String username=sharedpreferences.getString("username","");
+        String UUID=sharedpreferences.getString("UUID","null");
+
+        String url= AppBaseURL.BaseURL+"deviceToken/"+username+"/"+UUID;
+        JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(Request.Method.DELETE, url,
+                new JSONObject(), new Response.Listener<JSONObject>() {
+            @Override
+            public void onResponse(JSONObject jsonObject) {
+                Log.d("Response", jsonObject.toString());
+                //Toast.makeText(context,jsonObject.toString(),Toast.LENGTH_SHORT).show();
+
+            }
+        }, new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError error) {
+                Log.d("Error.Response", error.getMessage());
+            }
+        }
+        ){
+            @Override
+            public Map<String, String> getHeaders() throws AuthFailureError {
+                HashMap<String, String> headers = new HashMap<String, String>();
+                headers.put("Content-Type", "application/json; charset=utf-8");
+                return headers;
+            }
+        };
+        jsonObjectRequest.setShouldCache(false);
         Volley.newRequestQueue(context).add(jsonObjectRequest);
     }
 }
