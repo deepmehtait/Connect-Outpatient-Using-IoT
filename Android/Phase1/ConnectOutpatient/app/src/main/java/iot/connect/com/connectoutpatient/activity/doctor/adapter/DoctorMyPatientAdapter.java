@@ -7,6 +7,7 @@ import android.view.ViewGroup;
 import android.widget.BaseAdapter;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.squareup.picasso.Picasso;
 
@@ -66,6 +67,13 @@ public class DoctorMyPatientAdapter extends BaseAdapter {
         holder.patientName.setText(mpld.get(position).getDisplayName());
         holder.patientPhoto = (ImageView) row.findViewById(R.id.patientImage);
         Picasso.with(row.getContext()).load(AppBaseURL.BaseURL+mpld.get(position).getProfileImageURL()).error(R.drawable.noimg).into(holder.patientPhoto);
+
+        row.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Toast.makeText(context,"Name-"+mpld.get(position).getDisplayName(),Toast.LENGTH_SHORT).show();
+            }
+        });
         return row;
     }
 }

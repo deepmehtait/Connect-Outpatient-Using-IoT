@@ -22,12 +22,13 @@
 
         </android.support.v7.widget.Toolbar>
         <!-- Main Content -->
-        <TextView
+        <Button
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Patient Settings"
-            android:gravity="center"
-            />
+            android:text="Signout"
+            android:id="@+id/patientSignout"
+            android:layout_marginTop="150dp"
+            android:layout_marginLeft="120dp"/>
 
     </LinearLayout>
 

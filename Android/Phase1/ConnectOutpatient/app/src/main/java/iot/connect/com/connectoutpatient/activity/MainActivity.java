@@ -174,7 +174,7 @@ public class MainActivity extends AppCompatActivity {
                 }, new Response.ErrorListener() {
                     @Override
                     public void onErrorResponse(VolleyError error) {
-                        Log.d("Error.Response", error.getMessage());
+                        Log.d("Error.Response", error.toString());
                     }
                 }
                 ){
@@ -185,6 +185,7 @@ public class MainActivity extends AppCompatActivity {
                         return headers;
                     }
                 };
+                jsonObjectRequest.setShouldCache(false);
                 Volley.newRequestQueue(getApplicationContext()).add(jsonObjectRequest);
 
             }

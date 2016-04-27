@@ -48,7 +48,7 @@ public class RegisterToken {
             @Override
             public void onResponse(JSONObject jsonObject) {
                 Log.d("Response", jsonObject.toString());
-                Toast.makeText(context,jsonObject.toString(),Toast.LENGTH_SHORT).show();
+                //Toast.makeText(context,jsonObject.toString(),Toast.LENGTH_SHORT).show();
 
             }
         }, new Response.ErrorListener() {

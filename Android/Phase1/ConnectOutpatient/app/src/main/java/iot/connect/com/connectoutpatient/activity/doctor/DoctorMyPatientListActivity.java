@@ -1,5 +1,6 @@
 package iot.connect.com.connectoutpatient.activity.doctor;
 
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
@@ -46,12 +47,12 @@ public class DoctorMyPatientListActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_doctor_mypatient_list);
         sharedpreferences = getSharedPreferences("ConnectIoT", getApplicationContext().MODE_PRIVATE);
-        toolbar=(Toolbar)findViewById(R.id.toolbar);
-        drawerLayout=(DrawerLayout)findViewById(R.id.drawer_layout);
-        recyclerView=(RecyclerView)findViewById(R.id.drawer_recyclerView);
-        mypatientList=(ListView)findViewById(R.id.mypatientListView);
+        toolbar = (Toolbar) findViewById(R.id.toolbar);
+        drawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
+        recyclerView = (RecyclerView) findViewById(R.id.drawer_recyclerView);
+        mypatientList = (ListView) findViewById(R.id.mypatientListView);
         setSupportActionBar(toolbar);
-        ActionBarDrawerToggle actionBarDrawerToggle=new ActionBarDrawerToggle(this,drawerLayout,toolbar,R.string.app_name,R.string.app_name);
+        ActionBarDrawerToggle actionBarDrawerToggle = new ActionBarDrawerToggle(this, drawerLayout, toolbar, R.string.app_name, R.string.app_name);
         drawerLayout.addDrawerListener(actionBarDrawerToggle);
         actionBarDrawerToggle.syncState();
         setTitle("My Patient List");
@@ -59,28 +60,28 @@ public class DoctorMyPatientListActivity extends AppCompatActivity {
         rows.add("Dashboard");
         rows.add("My Patients");
         rows.add("Settings");
-        String email=sharedpreferences.getString("email","");
-        String pic=sharedpreferences.getString("profilepic","http://www.sourcecoi.com/sites/default/files/team/defaultpic_0.png");
+        String email = sharedpreferences.getString("email", "");
+        String pic = sharedpreferences.getString("profilepic", "http://www.sourcecoi.com/sites/default/files/team/defaultpic_0.png");
         DrawerAdapterDoctor drawerAdapter = new DrawerAdapterDoctor(getApplicationContext(), rows, email, pic);
 
         recyclerView.setAdapter(drawerAdapter);
         recyclerView.setHasFixedSize(true);
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
 
-        String URL= AppBaseURL.BaseURL+"doctor/patients/johndoe";
+        String URL = AppBaseURL.BaseURL + "doctor/patients/johndoe";
         JsonObjectRequest jsonRequest = new JsonObjectRequest(Request.Method.GET, URL, (JSONObject) null, new Response.Listener<JSONObject>() {
 
             @Override
             public void onResponse(JSONObject response) {
                 // the response is already constructed as a JSONObject!
-                Log.d("Response-",response.toString());
-                MyPatientList mPL=new MyPatientList();
-                Gson gs=new Gson();
-                mPL=gs.fromJson(response.toString(),MyPatientList.class);
+                Log.d("Response-", response.toString());
+                MyPatientList mPL = new MyPatientList();
+                Gson gs = new Gson();
+                mPL = gs.fromJson(response.toString(), MyPatientList.class);
 
-                if(mPL.getMessage().matches("Success")){
-                    ArrayList<MyPatientListDetails> mpld=new ArrayList<MyPatientListDetails>(mPL.getData());
-                    mypatientList.setAdapter(new DoctorMyPatientAdapter(getApplicationContext(),mpld));
+                if (mPL.getMessage().matches("Success")) {
+                    ArrayList<MyPatientListDetails> mpld = new ArrayList<MyPatientListDetails>(mPL.getData());
+                    mypatientList.setAdapter(new DoctorMyPatientAdapter(getApplicationContext(), mpld));
                 }
 
             }
@@ -94,36 +95,14 @@ public class DoctorMyPatientListActivity extends AppCompatActivity {
         });
 
         Volley.newRequestQueue(getApplicationContext()).add(jsonRequest);
+    }
 
-
-
-        /*ArrayList<String> name=new ArrayList<String>();
-        name.add("Patient 1");
-        name.add("Patient 2");
-        name.add("Patient 3");
-        name.add("Patient 4");
-        name.add("Patient 5");
-        name.add("Patient 6");
-        name.add("Patient 1");
-        name.add("Patient 2");
-        name.add("Patient 3");
-        name.add("Patient 4");
-        name.add("Patient 5");
-        name.add("Patient 6");
-        ArrayList<String> url=new ArrayList<String>();
-        url.add("http://52.8.186.40/modules/users/client/img/profile/default.png");
-        url.add("http://handh.headlinesandhero.netdna-cdn.com/wordP/wp-content/uploads/2015/11/Andreea-Cristina1.jpg");
-        url.add("http://www.famousbirthdays.com/faces/cerny-amanda-image.jpg");
-        url.add("http://52.8.186.40/modules/users/client/img/profile/default.png");
-        url.add("http://handh.headlinesandhero.netdna-cdn.com/wordP/wp-content/uploads/2015/11/Andreea-Cristina1.jpg");
-        url.add("http://www.famousbirthdays.com/faces/cerny-amanda-image.jpg");
-        url.add("http://52.8.186.40/modules/users/client/img/profile/default.png");
-        url.add("http://handh.headlinesandhero.netdna-cdn.com/wordP/wp-content/uploads/2015/11/Andreea-Cristina1.jpg");
-        url.add("http://www.famousbirthdays.com/faces/cerny-amanda-image.jpg");
-        url.add("http://52.8.186.40/modules/users/client/img/profile/default.png");
-        url.add("http://handh.headlinesandhero.netdna-cdn.com/wordP/wp-content/uploads/2015/11/Andreea-Cristina1.jpg");
-        url.add("http://www.famousbirthdays.com/faces/cerny-amanda-image.jpg");
-        mypatientList.setAdapter(new DoctorMyPatientAdapter(getApplicationContext(),name,url));*/
-
+    // Handle back button event fired.
+    @Override
+    public void onBackPressed() {
+        // Go To Dashboard
+        Intent i = new Intent(getApplicationContext(), DoctorDashboardActivity.class);
+        i.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+        startActivity(i);
     }
 }
