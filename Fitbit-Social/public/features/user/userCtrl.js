@@ -10,6 +10,9 @@ app.controller('UserCtrl', function ($scope, userService) {
       console.log('FITBIT HEART DATA: ', $scope.fitbitData.heartRateToday);
 
      $scope.heart = $scope.fitbitData.heartRateToday;
+
+     $scope.heartStream = $scope.fitbitData.heartStreamingData;
+
       // DISPLAY USERNAME //
       $scope.username           = $scope.fitbitData.profile.user.fullName;
 
