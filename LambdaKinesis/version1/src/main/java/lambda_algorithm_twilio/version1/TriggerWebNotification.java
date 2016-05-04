@@ -13,8 +13,11 @@ import org.json.JSONObject;
 import com.twilio.sdk.TwilioRestException;
 
 public class TriggerWebNotification {
+	private static int centerValue = 72;
+	private final static int delta = 9;
+	
 	public static void process(String value, String sensorID) throws Exception{
-		if(value.equalsIgnoreCase("72")){
+		if(criticalEstimate(Integer.parseInt(value))){
 		  String url = "http://52.8.186.40/notification";
 		  String param = "{\"fitBitId\":\"" + sensorID + "\", \"value\":\"" + value + "\"}";
 		  String charset = "UTF-8"; 
@@ -43,6 +46,19 @@ public class TriggerWebNotification {
 		  }
 		  callTwilio(patientObj.get("emergencyContactNumber").toString(), value, patientObj.get("displayName").toString(), patientObj.get("emergencyContactName").toString());
 		}
+	}
+	
+	private static boolean criticalEstimate(int heartRate) {
+		int difference = heartRate - centerValue;
+		if(Math.abs(difference) >= delta){
+			System.out.println("Critical HeartRate");
+			return true;
+		}
+		else{
+			centerValue = (centerValue + heartRate)/2 ;
+		}
+		System.out.println("No Critical HeartRate" + centerValue);
+		return false;
 	}
 	
 	public static void callTwilio(String contactNumber, String record, String patientName, String contactName){

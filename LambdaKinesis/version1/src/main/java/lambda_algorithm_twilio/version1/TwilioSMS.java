@@ -19,7 +19,7 @@ public class TwilioSMS {
 	 List<NameValuePair> params = new ArrayList<NameValuePair>(); 
 	 params.add(new BasicNameValuePair("To", contactNumber)); 
 	 params.add(new BasicNameValuePair("From", "+18442932272")); 
-	 params.add(new BasicNameValuePair("Body", "Hi " + contactName + "! Patient " + patientName + " has heart rate of " + value + ". It is beyond the threshold value."));   
+	 params.add(new BasicNameValuePair("Body", "Hi " + contactName + "! Patient " + patientName + " has heart rate of " + value + ". It is beyond the set delta value."));   
  
 	 MessageFactory messageFactory = client.getAccount().getMessageFactory(); 
 	 Message message = messageFactory.create(params); 

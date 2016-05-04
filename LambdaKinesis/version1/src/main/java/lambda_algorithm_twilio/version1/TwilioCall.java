@@ -23,7 +23,7 @@ public class TwilioCall {
 	params.add(new BasicNameValuePair("To", contactNumber)); 
 	params.add(new BasicNameValuePair("From", "+18442932272")); 
 	try {
-		params.add(new BasicNameValuePair("Url", "http://ishneetkaur.com/testmsg9.php?patientName=" + URLEncoder.encode(patientName, "UTF-8") + "&value=" + value + "&contactName=" + URLEncoder.encode(contactName, "UTF-8")));
+		params.add(new BasicNameValuePair("Url", "http://ishneetkaur.com/testmsg10.php?patientName=" + URLEncoder.encode(patientName, "UTF-8") + "&value=" + value + "&contactName=" + URLEncoder.encode(contactName, "UTF-8")));
 	} catch (UnsupportedEncodingException e) {
 		System.out.println("URL Formation Exception in Twilio Call");
 		e.printStackTrace();
