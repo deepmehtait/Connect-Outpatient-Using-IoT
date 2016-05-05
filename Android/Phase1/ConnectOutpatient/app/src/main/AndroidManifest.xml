@@ -46,6 +46,9 @@
         <activity android:name=".activity.doctor.DoctorPatientDetail">
 
         </activity>
+        <activity android:name=".activity.doctor.DoctorSetPatientMedication">
+
+        </activity>
         <!--Registration Service-->
         <service android:name=".gcm.RegistrationIntentService" android:exported="false"/>
         <!--Instance ID listner -->

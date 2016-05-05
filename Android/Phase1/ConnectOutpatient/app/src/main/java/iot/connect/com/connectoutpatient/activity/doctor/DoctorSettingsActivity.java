@@ -51,6 +51,7 @@ public class DoctorSettingsActivity extends AppCompatActivity {
         List<String> rows = new ArrayList<>();
         rows.add("Dashboard");
         rows.add("My Patients");
+        rows.add("Set Medication");
         rows.add("Settings");
 
         String email = sharedpreferences.getString("email", "");

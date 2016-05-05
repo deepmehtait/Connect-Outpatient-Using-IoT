@@ -10,14 +10,35 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.widget.ListView;
+import android.widget.Toast;
+
+import com.android.volley.Request;
+import com.android.volley.Response;
+import com.android.volley.VolleyError;
+import com.android.volley.toolbox.JsonArrayRequest;
+import com.android.volley.toolbox.JsonObjectRequest;
+import com.android.volley.toolbox.Volley;
+import com.google.gson.Gson;
+import com.google.gson.JsonObject;
+
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import java.util.ArrayList;
 import java.util.List;
 
 import iot.connect.com.connectoutpatient.R;
 import iot.connect.com.connectoutpatient.activity.adapter.DaysOfWeekAdapter;
+import iot.connect.com.connectoutpatient.activity.doctor.adapter.DoctorMyPatientAdapter;
+import iot.connect.com.connectoutpatient.modals.DaysOfWeekData;
+import iot.connect.com.connectoutpatient.modals.MyPatientList;
+import iot.connect.com.connectoutpatient.modals.MyPatientListDetails;
 import iot.connect.com.connectoutpatient.modals.dayAndMedication;
+import iot.connect.com.connectoutpatient.utils.AppBaseURL;
+import iot.connect.com.connectoutpatient.utils.AppStatus;
 
 /**
  * Created by Deep on 23-Apr-16.
@@ -51,52 +72,65 @@ public class PatientMedication extends AppCompatActivity {
         recyclerView.setAdapter(drawerAdapter);
         recyclerView.setHasFixedSize(true);
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
-        dayAndMedication dam=new dayAndMedication();
-        dam.setDay("Monday");
-        dam.setMorning(" Take medication 1, 2, 3");
-        dam.setNoon(" Take medication 3, 2");
-        dam.setEvening(" Take medication 4, 5, 1");
-        dayAndMedication dam1=new dayAndMedication();
-        dam1.setDay("Tuesday");
-        dam1.setMorning(" Take medication 1, 2, 3");
-        dam1.setNoon(" Take medication 3, 2");
-        dam1.setEvening(" Take medication 4, 5, 1");
-        dayAndMedication dam2=new dayAndMedication();
-        dam2.setDay("Wednesday");
-        dam2.setMorning(" Take medication 1, 2, 3");
-        dam2.setNoon(" Take medication 3, 2");
-        dam2.setEvening(" Take medication 4, 5, 1");
-        dayAndMedication dam3=new dayAndMedication();
-        dam3.setDay("Thursday");
-        dam3.setMorning(" Take medication 1, 2, 3");
-        dam3.setNoon(" Take medication 3, 2");
-        dam3.setEvening(" Take medication 4, 5, 1");
-        dayAndMedication dam4=new dayAndMedication();
-        dam4.setDay("Friday");
-        dam4.setMorning(" Take medication 1, 2, 3");
-        dam4.setNoon(" Take medication 3, 2");
-        dam4.setEvening(" Take medication 4, 5, 1");
-        dayAndMedication dam5=new dayAndMedication();
-        dam5.setDay("Saturday");
-        dam5.setMorning(" Take medication 1, 2, 3");
-        dam5.setNoon(" Take medication 3, 2");
-        dam5.setEvening(" Take medication 4, 5, 1");
-        dayAndMedication dam6=new dayAndMedication();
-        dam6.setDay("Sunday");
-        dam6.setMorning(" Take medication 1, 2, 3");
-        dam6.setNoon(" Take medication 3, 2");
-        dam6.setEvening(" Take medication 4, 5, 1");
-        ArrayList<dayAndMedication> al=new ArrayList<dayAndMedication>();
-        al.add(dam);
-        al.add(dam1);
-        al.add(dam2);
-        al.add(dam3);
-        al.add(dam4);
-        al.add(dam5);
-        al.add(dam6);
+
+
 
         dayMedication=(ListView)findViewById(R.id.DaysListView);
-        dayMedication.setAdapter(new DaysOfWeekAdapter(getApplicationContext(),al));
+
+
+
+
+        if (AppStatus.getInstance(getApplicationContext()).isOnline()) {
+
+
+            String URL = AppBaseURL.BaseURL + "medication/newpatient";
+
+            JsonArrayRequest jsonRequest = new JsonArrayRequest(Request.Method.GET, URL, (JSONObject) null, new Response.Listener<JSONArray>() {
+
+                @Override
+                public void onResponse(JSONArray response) {
+                    // the response is already constructed as a JSONObject!
+                    ArrayList<dayAndMedication> dayAndMedications=new ArrayList<dayAndMedication>();
+                    Log.d("Response-", response.toString());
+                    Log.d("Size", ""+response.length());
+                    for(int i=0;i<response.length();i++){
+                        JSONObject obj=response.optJSONObject(i);
+                        dayAndMedication dam=new dayAndMedication();
+                        try{
+                            dam.setName(obj.getString("name"));
+                            dam.setDosage(obj.getString("dosage"));
+                            dam.setCompany(obj.getString("company"));
+                            dam.setDay(obj.getString("day"));
+                            dam.setTime(obj.getString("time"));
+                        }catch (JSONException e){
+                            e.printStackTrace();
+                        }
+
+                        dayAndMedications.add(dam);
+                    }
+                    dayMedication.setAdapter(new DaysOfWeekAdapter(getApplicationContext(),dayAndMedications));
+                    //DaysOfWeekData daysOfWeekData=new DaysOfWeekData();
+                    //Gson gs = new Gson();
+
+                    //daysOfWeekData=gs.fromJson(response.toString(),DaysOfWeekData.class);
+                    //Log.d("Arrlis","Size = "+daysOfWeekData.getDaysofweek().size());
+                    //dayMedication.setAdapter(new DaysOfWeekAdapter(getApplicationContext(),daysOfWeekData.getDaysofweek()));
+                }
+            }, new Response.ErrorListener() {
+
+                @Override
+                public void onErrorResponse(VolleyError error) {
+
+                    error.printStackTrace();
+                }
+            });
+            jsonRequest.setShouldCache(false);
+            Volley.newRequestQueue(getApplicationContext()).add(jsonRequest);
+        } else {
+            // If no network connectivity notify user
+            Toast.makeText(getApplicationContext(), "Please Check Internet Connection", Toast.LENGTH_SHORT).show();
+        }
+
 
     }
 

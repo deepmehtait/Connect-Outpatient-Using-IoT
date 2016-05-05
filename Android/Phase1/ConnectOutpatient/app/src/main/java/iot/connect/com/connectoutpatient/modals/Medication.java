@@ -1,10 +1,9 @@
 package iot.connect.com.connectoutpatient.modals;
 
 /**
- * Created by Deep on 23-Apr-16.
+ * Created by Deep on 04-May-16.
  */
-public class dayAndMedication {
-
+public class Medication {
     String name,dosage,doctorId,company,day,time;
 
     public String getCompany() {
