@@ -6,6 +6,8 @@ import android.media.Image;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
+import android.view.View;
+import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -29,6 +31,7 @@ public class DoctorPatientDetail extends AppCompatActivity {
     ImageView profilepic;
     TextView Name,Moreinfo;
     GraphView graph;
+    Button viewMedication;
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -36,10 +39,11 @@ public class DoctorPatientDetail extends AppCompatActivity {
         profilepic=(ImageView)findViewById(R.id.patientProfilePic);
         Name=(TextView)findViewById(R.id.patientdetailName);
         Moreinfo=(TextView)findViewById(R.id.patientdetailMoreInfo);
+        viewMedication=(Button)findViewById(R.id.btn_viewMedication);
         Intent i=getIntent();
         String PName=i.getStringExtra("patientName");
         String PPicUrl=i.getStringExtra("picURL");
-        String PUsername=i.getStringExtra("id");
+        final String PUsername=i.getStringExtra("id");
         Picasso.with(getApplicationContext()).load(AppBaseURL.BaseURL+PPicUrl).into(profilepic);
         Name.setText("Name: "+PName);
         Moreinfo.setText(PName+" has recently been diagnosed with heart pain issues.\nThe Patient have been recently examined for regular post surgery check and shown good sign of recovery. ");
@@ -108,6 +112,15 @@ public class DoctorPatientDetail extends AppCompatActivity {
             }
         });
 
+        // Handle New Medication button
+        viewMedication.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent i = new Intent(DoctorPatientDetail.this,DoctorViewPatientMedication.class);
+                i.putExtra("id",PUsername);
+                startActivity(i);
+            }
+        });
 
     }
 }

@@ -10,16 +10,13 @@
     <string name="email">Email</string>
     <string-array name="daysList">
         <item>Daily</item>
-        <item>M,W,F,Su</item>
-        <item>Tu,Th,Sa</item>
-        <item>M,W,F</item>
-        <item>M</item>
-        <item>Tu</item>
-        <item>W</item>
-        <item>Th</item>
-        <item>F</item>
-        <item>Sa</item>
-        <item>Su</item>
+        <item>Monday</item>
+        <item>Tuesday</item>
+        <item>Wednesday</item>
+        <item>Thursday</item>
+        <item>Friday</item>
+        <item>Saturday</item>
+        <item>Sunday</item>
     </string-array>
     <string-array name="time">
         <item>0:00</item>

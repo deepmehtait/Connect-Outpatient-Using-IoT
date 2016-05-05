@@ -1,16 +1,13 @@
-package iot.connect.com.connectoutpatient.activity.patient;
+package iot.connect.com.connectoutpatient.activity.doctor;
 
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
-import android.support.v4.widget.DrawerLayout;
-import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.LinearLayoutManager;
-import android.support.v7.widget.RecyclerView;
-import android.support.v7.widget.Toolbar;
 import android.util.Log;
+import android.widget.Adapter;
+import android.widget.ListAdapter;
 import android.widget.ListView;
 import android.widget.Toast;
 
@@ -18,68 +15,39 @@ import com.android.volley.Request;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.JsonArrayRequest;
-import com.android.volley.toolbox.JsonObjectRequest;
 import com.android.volley.toolbox.Volley;
-import com.google.gson.Gson;
-import com.google.gson.JsonObject;
 
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
-import java.util.List;
 
 import iot.connect.com.connectoutpatient.R;
-import iot.connect.com.connectoutpatient.activity.adapter.DaysOfWeekAdapter;
-import iot.connect.com.connectoutpatient.activity.doctor.adapter.DoctorMyPatientAdapter;
-import iot.connect.com.connectoutpatient.modals.DaysOfWeekData;
-import iot.connect.com.connectoutpatient.modals.MyPatientList;
-import iot.connect.com.connectoutpatient.modals.MyPatientListDetails;
+import iot.connect.com.connectoutpatient.activity.doctor.adapter.DaysOfWeekAdapter;
 import iot.connect.com.connectoutpatient.modals.dayAndMedication;
 import iot.connect.com.connectoutpatient.utils.AppBaseURL;
 import iot.connect.com.connectoutpatient.utils.AppStatus;
 
 /**
- * Created by Deep on 23-Apr-16.
+ * Created by Deep on 04-May-16.
  */
-public class PatientMedication extends AppCompatActivity {
-    DrawerLayout drawerLayout;
-    Toolbar toolbar;
-    RecyclerView recyclerView;
+public class DoctorViewPatientMedication extends AppCompatActivity {
     ListView dayMedication;
+    ListAdapter adapter;
     SharedPreferences sharedpreferences;
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_patient_medications);
+        Intent i=getIntent();
+        final String pusername=i.getStringExtra("id");
         sharedpreferences = getSharedPreferences("ConnectIoT", getApplicationContext().MODE_PRIVATE);
-        toolbar=(Toolbar)findViewById(R.id.toolbar);
-        drawerLayout=(DrawerLayout)findViewById(R.id.drawer_layout);
-        recyclerView=(RecyclerView)findViewById(R.id.drawer_recyclerView);
-        setSupportActionBar(toolbar);
-        ActionBarDrawerToggle actionBarDrawerToggle=new ActionBarDrawerToggle(this,drawerLayout,toolbar,R.string.app_name,R.string.app_name);
-        drawerLayout.addDrawerListener(actionBarDrawerToggle);
-        actionBarDrawerToggle.syncState();
-        setTitle("My Medications");
-        List<String> rows = new ArrayList<>();
-        rows.add("Dashboard");
-        rows.add("My Medications");
-        rows.add("Settings");
-        String email=sharedpreferences.getString("email","");
-        String pic=sharedpreferences.getString("profilepic","http://www.sourcecoi.com/sites/default/files/team/defaultpic_0.png");
-        DrawerAdapterPatient drawerAdapter = new DrawerAdapterPatient(getApplicationContext(),rows,email,pic);
-        recyclerView.setAdapter(drawerAdapter);
-        recyclerView.setHasFixedSize(true);
-        recyclerView.setLayoutManager(new LinearLayoutManager(this));
-
-
-
         dayMedication=(ListView)findViewById(R.id.DaysListView);
         if (AppStatus.getInstance(getApplicationContext()).isOnline()) {
 
 
-            String URL = AppBaseURL.BaseURL + "medication/newpatient";
+            String URL = AppBaseURL.BaseURL + "medication/"+pusername;
 
             JsonArrayRequest jsonRequest = new JsonArrayRequest(Request.Method.GET, URL, (JSONObject) null, new Response.Listener<JSONArray>() {
 
@@ -104,7 +72,8 @@ public class PatientMedication extends AppCompatActivity {
 
                         dayAndMedications.add(dam);
                     }
-                    dayMedication.setAdapter(new DaysOfWeekAdapter(getApplicationContext(),dayAndMedications));
+                    adapter=new DaysOfWeekAdapter(getApplicationContext(),dayAndMedications,pusername);
+                    dayMedication.setAdapter(adapter);
                     //DaysOfWeekData daysOfWeekData=new DaysOfWeekData();
                     //Gson gs = new Gson();
 
@@ -126,17 +95,12 @@ public class PatientMedication extends AppCompatActivity {
             // If no network connectivity notify user
             Toast.makeText(getApplicationContext(), "Please Check Internet Connection", Toast.LENGTH_SHORT).show();
         }
-
-
     }
 
-    // Handle back button event fired.
     @Override
-    public void onBackPressed()
-    {
-        // Go To Dashboard
-        Intent i=new Intent(getApplicationContext(),PatientDashboardActivity.class);
-        i.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
-        startActivity(i);
+    protected void onResume() {
+        super.onResume();
+       // adapter.notifyAll();
     }
+
 }
