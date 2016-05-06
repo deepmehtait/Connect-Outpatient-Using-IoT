@@ -1,26 +1,12 @@
-<div ng-if="!fitbitData" class="loading">
-  <div class="spinner">
-    <div class="bounce1"></div>
-    <div class="bounce2"></div>
-    <div class="bounce3"></div>
-  </div>
-  <h2>Loading your Fitbit data</h2>
-</div>
-
 <div class="parent-wrapper">
-  <div ng-if="fitbitData" class="user-main-container">
-    <div class="user-dashboard-container">
-      <div class="sm-widget" id="sm-widget-header">
-        <div>
-          <h4 id="dashboard-header">Connect Outpatient Dashboard</h4>
-            <h5 id="user-welcome">Welcome, {{heart}} , {{ username }},{{heartToday}}, Gender: {{gender}}, Height: {{height}} {{heightUnit}}, {{locale}} , Member Since - {{memberSince}}, {{weight}} {{weightUnit}} </h5>
-               <h5>{{heartStream}}</h5>
-
-        </div>
+      <div class="user-dashboard-container">
+         <div class="sm-widget" id="sm-widget-header">
+            <div>
+               <h4 id="dashboard-header">Connect Outpatient Dashboard</h4>
+               <form>
+               </form>
+               <h5 id="user-welcome">Welcome</h5>
+            </div>
       </div>
-    </div>
-  </div>
+   </div>
 </div>
-
-
-   
