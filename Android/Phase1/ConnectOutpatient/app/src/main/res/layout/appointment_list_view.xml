@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="horizontal" android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <de.hdodenhof.circleimageview.CircleImageView
+        xmlns:app="http://schemas.android.com/apk/res-auto"
+        app:border_color="@color/divider"
+        app:border_width="1dp"
+        android:src="@mipmap/ic_launcher"
+        android:id="@+id/patientImage"
+        android:layout_width="60dp"
+        android:layout_height="60dp"
+        android:layout_margin="20dp">
+
+    </de.hdodenhof.circleimageview.CircleImageView>
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Name:"
+        android:id="@+id/patientName"
+        android:layout_marginLeft="100dp"
+        android:layout_marginTop="10dp"
+        android:textColor="@color/primary_text"
+        android:textAppearance="?android:attr/textAppearanceLarge" />
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/patientName"
+        android:layout_marginLeft="100dp"
+        android:textAppearance="?android:attr/textAppearanceSmall"
+        android:textColor="@color/primary_text"
+        android:text="Time"
+        android:id="@+id/Time"/>
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/Time"
+        android:layout_marginLeft="100dp"
+        android:textColor="@color/primary_text"
+        android:text="Date"
+        android:textAppearance="?android:attr/textAppearanceSmall"
+        android:id="@+id/Date"/>
+
+
+    <ImageView
+        android:layout_width="20dp"
+        android:layout_height="20dp"
+        android:src="@drawable/ic_location_on_black_24dp"
+        android:layout_below="@id/Date"
+        android:layout_marginLeft="100dp"/>
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Name:"
+            android:id="@+id/location"
+            android:layout_below="@id/Date"
+            android:layout_marginLeft="120dp"
+            android:textColor="@color/primary_text"
+            android:textAppearance="?android:attr/textAppearanceSmall" />
+
+
+</RelativeLayout>

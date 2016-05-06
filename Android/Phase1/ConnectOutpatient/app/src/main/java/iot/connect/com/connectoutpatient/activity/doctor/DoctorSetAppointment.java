@@ -17,6 +17,7 @@ import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.android.volley.AuthFailureError;
 import com.android.volley.Request;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
@@ -24,13 +25,17 @@ import com.android.volley.toolbox.JsonObjectRequest;
 import com.android.volley.toolbox.Volley;
 import com.google.gson.Gson;
 
+import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.HashMap;
+import java.util.Map;
+import java.util.concurrent.ExecutionException;
 
 import iot.connect.com.connectoutpatient.R;
+import iot.connect.com.connectoutpatient.modals.AddAppoinment;
 import iot.connect.com.connectoutpatient.modals.MyPatientList;
 import iot.connect.com.connectoutpatient.modals.MyPatientListDetails;
 import iot.connect.com.connectoutpatient.utils.AppBaseURL;
@@ -126,11 +131,67 @@ public class DoctorSetAppointment extends AppCompatActivity {
         btnConfirm.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                String pName=patientNameMapper.get(patientName.getSelectedItem().toString());
-                String pUrl=patientProfileMappter.get(patientName.getSelectedItem().toString());
-                String timevalue=times.getSelectedItem().toString();
-                String[] date=tv.getText().toString().split(":");
-                Log.d("msg","Pid-"+pName+" time-"+timevalue+" Date-"+date[1]+" url-"+pUrl);
+                String timevalue=null,pName=null,pUrl=null;
+                String[] date=null;
+                try{
+                    pName=patientNameMapper.get(patientName.getSelectedItem().toString());
+                    pUrl=patientProfileMappter.get(patientName.getSelectedItem().toString());
+                    timevalue=times.getSelectedItem().toString();
+                     date=tv.getText().toString().split(":");
+                }catch (Exception e){
+                    e.printStackTrace();
+                }
+                AddAppoinment addAppoinment=new AddAppoinment();
+                addAppoinment.setDate(date[1]);
+                addAppoinment.setPatientName(patientName.getSelectedItem().toString());
+                addAppoinment.setDoctorId(userName);
+                addAppoinment.setPatientId(pName);
+                addAppoinment.setPatientProfileImageURL(pUrl);
+                addAppoinment.setTime(timevalue);
+
+                JSONObject js = null;
+                //js.
+                Log.d("Set Objects", " Set Objects 2");
+                Gson gs = new Gson();
+                Log.d("gson to object", gs.toJson(addAppoinment));
+                try {
+                    js = new JSONObject(gs.toJson(addAppoinment));
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+
+                if (AppStatus.getInstance(getApplicationContext()).isOnline()) {
+
+
+                    String url = AppBaseURL.BaseURL + "appointment";
+                    JSONObject jsonObject;
+                    JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(Request.Method.POST, url,
+                            js, new Response.Listener<JSONObject>() {
+                        @Override
+                        public void onResponse(JSONObject jsonObject) {
+                            Log.d("Response", jsonObject.toString());
+                            Toast.makeText(getApplicationContext(), jsonObject.toString(), Toast.LENGTH_SHORT).show();
+
+                        }
+                    }, new Response.ErrorListener() {
+                        @Override
+                        public void onErrorResponse(VolleyError error) {
+                            Log.d("Error.Response", error.toString());
+                        }
+                    }
+                    ) {
+                        @Override
+                        public Map<String, String> getHeaders() throws AuthFailureError {
+                            HashMap<String, String> headers = new HashMap<String, String>();
+                            headers.put("Content-Type", "application/json; charset=utf-8");
+                            return headers;
+                        }
+                    };
+                    Volley.newRequestQueue(getApplicationContext()).add(jsonObjectRequest);
+                } else {
+                    // If no network connectivity notify user
+                    Toast.makeText(getApplicationContext(), "Please Check Internet Connection", Toast.LENGTH_SHORT).show();
+                }
             }
         });
 
