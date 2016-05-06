@@ -68,6 +68,7 @@ public class DoctorDashboardActivity extends AppCompatActivity {
         rows.add("Dashboard");
         rows.add("My Patients");
         rows.add("Set Medication");
+        rows.add("Appointment");
         rows.add("Settings");
         String email=sharedpreferences.getString("email","");
         String pic=sharedpreferences.getString("profilepic","http://www.sourcecoi.com/sites/default/files/team/defaultpic_0.png");

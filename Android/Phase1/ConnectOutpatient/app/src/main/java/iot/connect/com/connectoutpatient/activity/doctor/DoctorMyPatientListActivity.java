@@ -61,8 +61,10 @@ public class DoctorMyPatientListActivity extends AppCompatActivity {
         rows.add("Dashboard");
         rows.add("My Patients");
         rows.add("Set Medication");
+        rows.add("Appointment");
         rows.add("Settings");
-        String email = sharedpreferences.getString("email", "");
+        final String email = sharedpreferences.getString("email", "");
+        final String userName=sharedpreferences.getString("username","");
         String pic = sharedpreferences.getString("profilepic", "http://www.sourcecoi.com/sites/default/files/team/defaultpic_0.png");
         DrawerAdapterDoctor drawerAdapter = new DrawerAdapterDoctor(getApplicationContext(), rows, email, pic);
 
@@ -73,7 +75,7 @@ public class DoctorMyPatientListActivity extends AppCompatActivity {
         if (AppStatus.getInstance(getApplicationContext()).isOnline()) {
 
 
-            String URL = AppBaseURL.BaseURL + "doctor/patients/johndoe";
+            String URL = AppBaseURL.BaseURL + "doctor/patients/"+userName;
             JsonObjectRequest jsonRequest = new JsonObjectRequest(Request.Method.GET, URL, (JSONObject) null, new Response.Listener<JSONObject>() {
 
                 @Override

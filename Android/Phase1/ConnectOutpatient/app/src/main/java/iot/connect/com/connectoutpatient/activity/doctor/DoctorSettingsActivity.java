@@ -52,6 +52,7 @@ public class DoctorSettingsActivity extends AppCompatActivity {
         rows.add("Dashboard");
         rows.add("My Patients");
         rows.add("Set Medication");
+        rows.add("Appointment");
         rows.add("Settings");
 
         String email = sharedpreferences.getString("email", "");

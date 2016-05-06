@@ -2,6 +2,7 @@ package iot.connect.com.connectoutpatient.activity.doctor;
 
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.widget.DrawerLayout;
@@ -36,10 +37,13 @@ import java.util.List;
 import java.util.Map;
 
 import iot.connect.com.connectoutpatient.R;
+import iot.connect.com.connectoutpatient.activity.doctor.adapter.DoctorMyPatientAdapter;
 import iot.connect.com.connectoutpatient.activity.patient.PatientDashboardActivity;
 import iot.connect.com.connectoutpatient.gcm.RegisterToken;
 import iot.connect.com.connectoutpatient.modals.AddMedication;
 import iot.connect.com.connectoutpatient.modals.Medication;
+import iot.connect.com.connectoutpatient.modals.MyPatientList;
+import iot.connect.com.connectoutpatient.modals.MyPatientListDetails;
 import iot.connect.com.connectoutpatient.modals.SignIn;
 import iot.connect.com.connectoutpatient.utils.AppBaseURL;
 import iot.connect.com.connectoutpatient.utils.AppStatus;
@@ -53,8 +57,8 @@ public class DoctorSetPatientMedication extends AppCompatActivity {
     RecyclerView recyclerView;
     SharedPreferences sharedpreferences;
     Button Save;
-    EditText patientID,MedicationName,Dosage,Manufature;
-    Spinner days,times;
+    EditText MedicationName,Dosage,Manufature;
+    Spinner days,times,patientName;
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -72,8 +76,10 @@ public class DoctorSetPatientMedication extends AppCompatActivity {
         rows.add("Set Medication");
         rows.add("My Patients");
         rows.add("Set Medication");
+        rows.add("Appointment");
         rows.add("Settings");
-        String email=sharedpreferences.getString("email","");
+        final String email=sharedpreferences.getString("email","");
+        final String userName=sharedpreferences.getString("username","");
         String pic=sharedpreferences.getString("profilepic","http://www.sourcecoi.com/sites/default/files/team/defaultpic_0.png");
         DrawerAdapterDoctor drawerAdapter = new DrawerAdapterDoctor(getApplicationContext(), rows, email, pic);
         recyclerView.setAdapter(drawerAdapter);
@@ -81,11 +87,65 @@ public class DoctorSetPatientMedication extends AppCompatActivity {
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
 
         // Edit text
-        patientID=(EditText)findViewById(R.id.input_patientID);
+
         MedicationName=(EditText)findViewById(R.id.input_medicationName);
         Dosage=(EditText)findViewById(R.id.input_dosage);
         Manufature=(EditText)findViewById(R.id.input_manufacture);
         Save=(Button)findViewById(R.id.btn_save);
+
+        final HashMap<String,String> patientNameMapper=new HashMap<String,String>();
+        final ArrayList<String> patientNameList=new ArrayList<String>();
+        patientName=(Spinner)findViewById(R.id.patientNamePicker);
+        // Get List of Patients of current doctor
+        if (AppStatus.getInstance(getApplicationContext()).isOnline()) {
+
+
+            String URL = AppBaseURL.BaseURL + "doctor/patients/"+userName;
+            JsonObjectRequest jsonRequest = new JsonObjectRequest(Request.Method.GET, URL, (JSONObject) null, new Response.Listener<JSONObject>() {
+
+                @Override
+                public void onResponse(JSONObject response) {
+                    // the response is already constructed as a JSONObject!
+                    Log.d("Response-", response.toString());
+                    MyPatientList mPL = new MyPatientList();
+                    Gson gs = new Gson();
+                    mPL = gs.fromJson(response.toString(), MyPatientList.class);
+
+                    if (mPL.getMessage().matches("Success")) {
+                        ArrayList<MyPatientListDetails> mpld = new ArrayList<MyPatientListDetails>(mPL.getData());
+                        for(int i=0;i<mpld.size();i++){
+                            patientNameMapper.put(mpld.get(i).getDisplayName(),mpld.get(i).getUsername());
+                            patientNameList.add(mpld.get(i).getDisplayName());
+                        }
+
+                        ArrayAdapter<String> arrayadaptername=new ArrayAdapter<String>(getApplicationContext(),android.R.layout.simple_spinner_item,patientNameList);
+                        arrayadaptername.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+                        arrayadaptername.notifyDataSetChanged();
+                        patientName.setAdapter(arrayadaptername);
+                        patientName.setBackgroundColor(Color.BLUE);
+
+                        //mypatientList.setAdapter(new DoctorMyPatientAdapter(getApplicationContext(), mpld));
+                    }
+
+
+                }
+            }, new Response.ErrorListener() {
+
+                @Override
+                public void onErrorResponse(VolleyError error) {
+
+                    error.printStackTrace();
+                }
+            });
+            jsonRequest.setShouldCache(false);
+            Volley.newRequestQueue(getApplicationContext()).add(jsonRequest);
+        } else {
+            // If no network connectivity notify user
+            Toast.makeText(getApplicationContext(), "Please Check Internet Connection", Toast.LENGTH_SHORT).show();
+        }
+
+
+
         // set spinner data - days
         days=(Spinner)findViewById(R.id.daypicker);
         ArrayAdapter<CharSequence> dayadapter=ArrayAdapter.createFromResource(this,R.array.daysList,android.R.layout.simple_spinner_item);
@@ -106,23 +166,24 @@ public class DoctorSetPatientMedication extends AppCompatActivity {
         Save.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                String patientid=patientID.getText().toString();
+                //String patientid=patientID.getText().toString();
                 String medicationname=MedicationName.getText().toString();
                 String dosage=Dosage.getText().toString();
                 String manufature=Manufature.getText().toString();
                 String daysvalue=days.getSelectedItem().toString();
                 String timevalue=times.getSelectedItem().toString();
+                String pName=patientName.getSelectedItem().toString();
 
                 Medication m=new Medication();
                 m.setName(medicationname);
                 m.setDosage(dosage);
-                m.setDoctorId(sharedpreferences.getString("email",""));
+                m.setDoctorId(sharedpreferences.getString("username",""));
                 m.setCompany(manufature);
                 m.setDay(daysvalue);
                 m.setTime(timevalue);
 
                 AddMedication addMedication=new AddMedication();
-                addMedication.setPatientId(patientid);
+                addMedication.setPatientId(patientNameMapper.get(pName));
                 addMedication.setMedications(m);
 
                 JSONObject js = null;
