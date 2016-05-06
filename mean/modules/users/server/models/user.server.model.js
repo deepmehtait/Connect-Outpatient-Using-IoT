@@ -118,6 +118,32 @@ var UserSchema = new Schema({
   emergencyContactNumber: {
     type: String,
     trim : true
+  },
+
+
+  address : {
+    type: String,
+    trim : true
+  },
+
+  city : {
+    type: String,
+    trim : true
+  },
+
+  state : {
+    type: String,
+    trim : true
+  },
+
+  zipcode : {
+    type: String,
+    trim : true
+  },
+
+  hospitalName : {
+    type: String,
+    trim : true
   }
 
 });
