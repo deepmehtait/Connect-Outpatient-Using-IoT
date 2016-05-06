@@ -54,7 +54,7 @@ exports.getAppointments = function (req, res) {
                 message: errorHandler.getErrorMessage(err)
             });
         } else {
-            res.json(data);
+            res.json({'data':data});
         }
     });
 };
