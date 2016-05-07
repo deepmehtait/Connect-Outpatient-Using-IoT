@@ -11,9 +11,11 @@ angular.module('core').controller('HomeController', ['$scope', '$http', 'Socket'
          $scope.labels.push(i);
          $scope.data.push(70+(i*2));
          }*/
+        console.log("----------------------------- ");
 
         $http.get('/medication/' + Authentication.user.username).success(function (response) {
             $scope.clientMedications = [];
+            console.log(response);
             if (response instanceof Array) {
                 $scope.clientMedications = response;
             }

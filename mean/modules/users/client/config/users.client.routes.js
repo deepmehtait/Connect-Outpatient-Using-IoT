@@ -7,9 +7,7 @@ angular.module('users').config(['$stateProvider',
     $stateProvider
       .state('doctor-dashboard', {
         url: '/doctor-dashboard',
-        templateUrl: 'modules/users/client/views/doctor-dashboard.client.view.html',
-        controller: 'DoctordashboardController',
-        controllerAs: 'vm'
+        templateUrl: 'modules/users/client/views/doctor-dashboard.client.view.html'
       })
       .state('settings', {
         abstract: true,

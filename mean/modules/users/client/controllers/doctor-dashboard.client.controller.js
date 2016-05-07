@@ -1,21 +1,26 @@
-(function() {
-  'use strict';
 
-  angular
-    .module('users')
-    .controller('DoctorDashboardController', DoctorDashboardController);
 
-  DoctorDashboardController.$inject = ['$scope'];
+var app =  angular.module('users');
 
-  function DoctorDashboardController($scope) {
-    var vm = this;
+app.controller('DoctorDashboardController', ['$scope', '$http', 'Socket', 'Authentication',
+    function ($scope, $http, Socket, Authentication) {
+        // This provides Authentication context.
+        $scope.authentication = Authentication;
+        $scope.viewIt = "hello";
 
-    // Doctor dashboard controller logic
-    // ...
 
-    init();
+        $http.get('/doctor/patients/' + Authentication.user.username).success(function (response) {
+        
 
-    function init() {
+            $scope.clientList = [];
+            if (response.data instanceof Array) {
+                $scope.clientList = response.data;
+            }
+
+           console.log($scope.clientList);
+
+        }).error(function (response) {
+            $scope.error = response.message;
+        });
     }
-  }
-})();
+]);
