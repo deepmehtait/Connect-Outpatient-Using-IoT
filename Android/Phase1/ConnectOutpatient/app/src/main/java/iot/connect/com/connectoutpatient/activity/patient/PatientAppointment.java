@@ -70,12 +70,7 @@ public class PatientAppointment extends AppCompatActivity {
         recyclerView.setAdapter(drawerAdapter);
         recyclerView.setHasFixedSize(true);
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
-
-
-
         appListview=(ListView)findViewById(R.id.appointmentListView);
-
-
         /// Get appointment for patient
         if (AppStatus.getInstance(getApplicationContext()).isOnline()) {
 
