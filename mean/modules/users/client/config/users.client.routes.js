@@ -5,6 +5,12 @@ angular.module('users').config(['$stateProvider',
   function ($stateProvider) {
     // Users state routing
     $stateProvider
+      .state('doctor-dashboard', {
+        url: '/doctor-dashboard',
+        templateUrl: 'modules/users/client/views/doctor-dashboard.client.view.html',
+        controller: 'DoctordashboardController',
+        controllerAs: 'vm'
+      })
       .state('settings', {
         abstract: true,
         url: '/settings',
