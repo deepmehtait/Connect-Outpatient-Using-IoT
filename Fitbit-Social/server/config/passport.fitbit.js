@@ -6,8 +6,8 @@ var FitbitStrategy = require('passport-fitbit-oauth2').FitbitOAuth2Strategy;
 module.exports = function (passport) {
 
   passport.use(new FitbitStrategy({
-    clientID: "227L64",
-    clientSecret: "aa7e26eebe713067abcfca962c5f54f7",
+    clientID: "227KT9",
+    clientSecret: "8dc1ea69daacbe7b4af8ef3ae94cf7d5",
     scope: ['activity', 'profile', 'heartrate', 'weight', 'location', 'settings', 'sleep', 'social'],
     expires_in : "259200",
     prompt : "login",

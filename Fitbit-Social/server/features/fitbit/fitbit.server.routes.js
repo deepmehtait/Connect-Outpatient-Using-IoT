@@ -8,10 +8,9 @@ var kinesis = require('./kinesis');
 var FITBIT_BASE_URL = 'https://api.fitbit.com/1/user/-';
 var schedule = require('node-schedule');
 var http = require('http');
-// var FitbitClient = require('fitbit-client-oauth2');
-// var client = new FitbitClient("227L55", "b455bffa7bf89e24a5a87114cf725aca");
-var clientID = "227L55";
-var clientSecret = "b455bffa7bf89e24a5a87114cf725aca";
+
+var clientID = "227KT9";
+var clientSecret = "8dc1ea69daacbe7b4af8ef3ae94cf7d5";
 var fitbitData;
 var fitbitCronData;
 var heartRateOptions;
@@ -59,7 +58,8 @@ module.exports = function(app, passport) {
             expires_in: 3600
         };
 
-        console.log(userCredentials.refreshToken);
+       
+        // console.log(userCredentials.refreshToken);
 
         function cronJob(fitbitData) {
             if (userCredentials.userId) {
@@ -191,7 +191,7 @@ module.exports = function(app, passport) {
                                 var b = JSON.parse(body);
                                 userCredentials.accessToken = b.access_token;
                                 userCredentials.refreshToken = b.refresh_token;
-                                console.log(userCredentials.refreshToken);
+                                // console.log(userCredentials.refreshToken);
                                 console.log(response.statusCode);
 
                             }
@@ -207,8 +207,8 @@ module.exports = function(app, passport) {
 
                 var pushData = schedule.scheduleJob('* * * * *', function() {
                     sensorid = userCredentials.userId;
-                    console.log(userCredentials.refreshToken);
-                    console.log(BASE_OPTIONS);
+                    // console.log(userCredentials.refreshToken);
+                    // console.log(BASE_OPTIONS);
                     var cronCurrentTime = new Date();
 
                     var cronHour = cronCurrentTime.getHours();
@@ -275,7 +275,6 @@ module.exports = function(app, passport) {
                         fitbitCronData.heartRateCronToday2 = str;
 
                         var value = JSON.parse(fitbitCronData.heartRateCronToday2);
-
 
 
                         if (value !== undefined) {
