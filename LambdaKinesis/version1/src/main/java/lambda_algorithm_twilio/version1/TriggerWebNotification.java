@@ -64,10 +64,20 @@ public class TriggerWebNotification {
 		  JSONObject result= new JSONObject(responseStrBuilder.toString());    
 		  JSONObject patientObj = (JSONObject) result.get("patientInfo");
 		  JSONArray doctors = (JSONArray) result.get("doctorInfo");
+		  String patientName = patientObj.get("displayName").toString();
+		  String emergencyContact = patientObj.get("emergencyContactNumber").toString();
+		  String emergencyName = patientObj.get("emergencyContactName").toString();
+		  
 		  for(int i = 0; i < doctors.length(); i++){
-			  callTwilio(((JSONObject)doctors.get(i)).get("phoneNumber").toString(), value, patientObj.get("displayName").toString(), ((JSONObject)doctors.get(i)).get("displayName").toString());
+			  // Email Notification to Doctors 
+			  EmailNotification.emailDoctor(patientName, value, ((JSONObject)doctors.get(i)).get("displayName").toString(), emergencyContact, emergencyName);
+			  // Make Call and send Message to the Doctors
+			  callTwilio(((JSONObject)doctors.get(i)).get("phoneNumber").toString(), value, patientName, ((JSONObject)doctors.get(i)).get("displayName").toString());
 		  }
-		  callTwilio(patientObj.get("emergencyContactNumber").toString(), value, patientObj.get("displayName").toString(), patientObj.get("emergencyContactName").toString());
+		  
+		  // Make Call and send Message to the Emergency Contact
+		  callTwilio(emergencyContact, value, patientName, emergencyName);		  
+		  
 		  System.out.println("Made Emergency Call for Sensor ID: " + sensorID);
 		  sensorMap.put(sensorID, false);
 		}
@@ -75,21 +85,19 @@ public class TriggerWebNotification {
 	
 	private static boolean criticalEstimate(int heartRate) {
 		int difference = heartRate - medValue;
+		if(Math.abs(difference) >= delta){
+			weightMap.put(heartRate, 1);
+		}
 		
 		if(weightMap.containsKey(heartRate)){
-			int val = weightMap.get(heartRate) + 1;
-			weightMap.remove(heartRate);
-			weightMap.put(heartRate, val);
 			if(((weightMap.get(heartRate) > 1) && (heartRate >= lastValue) && getSeries(heartRate)) || (Math.abs(centerValue - medValue) > 10)){
 				System.out.println("Critical HeartRate: " + heartRate);
 				return true;
 			}
+			int val = weightMap.get(heartRate) + 1;
+			weightMap.put(heartRate, val);
 		}
-		else{
-			if(Math.abs(difference) >= delta){
-				weightMap.put(heartRate, 1);
-			}
-		}
+		
 		centerValue = (centerValue + heartRate)/2 ;
 		System.out.println("Current Weight Map: " + weightMap);
 		System.out.println("No Critical HeartRate! Current Centroid: " + centerValue + "Current Heart Rate: " + heartRate);
@@ -113,7 +121,7 @@ public class TriggerWebNotification {
 	}
 	
 	public static void callTwilio(String contactNumber, String record, String patientName, String contactName){
-		try {
+		try {		
 			TwilioCall twilioCall = new TwilioCall();
 	        try {
 				twilioCall.callTwilio(contactNumber, patientName, record, contactName);
