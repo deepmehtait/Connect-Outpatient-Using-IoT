@@ -28,27 +28,13 @@
             android:background="@color/icons"
             android:fitsSystemWindows="true"
             android:orientation="vertical">
-        <ListView
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:id="@+id/appointmentListView">
+            <ListView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:id="@+id/appointmentListView">
 
-        </ListView>
+            </ListView>
 
-            <ImageButton
-                android:layout_width="56dp"
-                android:layout_height="56dp"
-                android:id="@+id/imageButton"
-                android:background="@drawable/oval"
-                android:layout_alignParentBottom="true"
-                android:layout_alignParentLeft="false"
-                android:elevation="10dp"
-                android:layout_alignParentRight="false"
-                android:layout_alignParentStart="false"
-                android:layout_alignParentEnd="true"
-                android:src="@drawable/ic_add_white_24dp"
-                android:layout_marginBottom="30dp"
-                android:layout_marginRight="30dp"/>
         </RelativeLayout>
 
     </LinearLayout>

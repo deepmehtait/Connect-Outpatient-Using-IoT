@@ -44,6 +44,7 @@ public class DoctorViewPatientMedication extends AppCompatActivity {
         final String pusername=i.getStringExtra("id");
         sharedpreferences = getSharedPreferences("ConnectIoT", getApplicationContext().MODE_PRIVATE);
         dayMedication=(ListView)findViewById(R.id.DaysListView);
+        setTitle("Patient Medication");
         if (AppStatus.getInstance(getApplicationContext()).isOnline()) {
 
 

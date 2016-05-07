@@ -1,668 +1,325 @@
 'use strict';
 
-var _               = require('lodash');
-var request         = require('request');
-var Promise         = require('bluebird');
-var BRequest        = Promise.promisify(request);
-var kinesis         = require('./kinesis');
-var foo             = require('./changeJSON');
+var _ = require('lodash');
+var request = require('request');
+var Promise = require('bluebird');
+var BRequest = Promise.promisify(request);
+var kinesis = require('./kinesis');
 var FITBIT_BASE_URL = 'https://api.fitbit.com/1/user/-';
-
 var schedule = require('node-schedule');
+var http = require('http');
 
+var clientID = "227KT9";
+var clientSecret = "8dc1ea69daacbe7b4af8ef3ae94cf7d5";
 var fitbitData;
-
 var fitbitCronData;
-
 var heartRateOptions;
-
 var heartRateCronOptions;
 var heartRateCronOptions2;
-
 var heartRateCronToday;
-
 var heartRateCronToday2;
 var userCredentials;
-  var previousTime;
-      var previousHour;
-      var previousMinute;
+var previousTime;
+var previousHour;
+var previousMinute;
 var sensorid;
 var BASE_OPTIONS;
 var REFRESH_OPTIONS;
-    var count= 0;
+var count = 0;
 
-module.exports = function (app, passport) {
+module.exports = function(app, passport) {
 
-  var reauth = false;
-  app.get('/auth/fitbit', passport.authenticate('fitbit'));
+    var reauth = false;
+    app.get('/auth/fitbit', passport.authenticate('fitbit'));
 
-  app.get('/auth/fitbit/callback', passport.authenticate('fitbit'), function (req, res) {
-    if (req.user) {
-      res.redirect('/#/user/' + req.user.profile.id);
+    app.get('/auth/fitbit/callback', passport.authenticate('fitbit'), function(req, res) {
+        if (req.user) {
+            res.redirect('/#/user/' + req.user.profile.id);
 
-    } else {
-      res.redirect('/');
-    }
-  });
-
-
-
-  // GET FITBIT DATA //
-
-  app.get('/api/v1/data', function (req, res) {
-
-    if (!req.user) {
-      res.status(500);
-    }
-
-    userCredentials = {
-      userId: req.user.profile.id,
-      accessToken: req.user.accessToken,
-      refreshToken: req.user.refreshToken
-    };
-
-    function cronJob(fitbitData){
-      if(userCredentials.userId){
-        console.log("here");
-        console.log(userCredentials.userId + "    ----------");
-
-        var cron = schedule.scheduleJob('* * * * * *', function(){
-            var user = fitbitData.profile.user.fullName;
-            var sensorid = userCredentials.userId;
-            
-      var date = new Date();
-
-            //start of getting data from Ftibit
-
-      //  var cronCurrentTime = new Date();
-      
-      // var cronHour =      cronCurrentTime.getHours();
-      
-      // var cronMinute = cronCurrentTime.getMinutes();
-      
-      // heartRateCronOptions         = _.cloneDeep(BASE_OPTIONS);
-
-      // heartRateCronOptions.url         = FITBIT_BASE_URL + '/activities/heart/date/today/1d/1min/time/00:00/'+ cronHour+':'+cronMinute+'.json';
-
-      //   Promise.props({
-       
-      //   heartRateCronToday: BRequest(heartRateCronOptions),
-       
-      // })
-      // .then(function (results) {
-
-      //   fitbitCronData = {
-         
-      //     heartRateCronToday: JSON.parse(results.heartRateCronToday.body),
-          
-      //   };
-          
-      //   var arr2 = JSON.stringify(fitbitData.heartRateCronToday);
-
-
-      //   var str2 = arr2.replace(/"activities-heart":/g, '"activitiesOfHeart":');
-
-      //   str2 = str2.replace(/"activities-heart-intraday":/g, '"activitiesHeartIntraday":')
-
-      //   fitbitCronData.heartRateCronToday = str2;
-        
-      //   console.log("str2      " + str2);
-        
-      //         var value = JSON.parse(heartRateCronToday);
-
-      // var value2 = value.activitiesOfHeart[0].value;
-
-      // request.post('http://ec2-54-67-123-247.us-west-1.compute.amazonaws.com/api/fitbitdata',{ json: {  
-      //                               "username" : user,
-      //                               "fitbitUsername" : sensorid,
-      //                               "healthdata" : {
-      //                                   "timestamp" : date,
-      //                                   "value" : value2
-      //                               },
-      //                       } 
-      //                   },
-      //                       function (error, response, body) {
-      //                           if (!error && response.statusCode == 200) {
-      //                               console.log(body);
-      //                               console.log("------=-=-=--=-=-=    ");
-      //                           }
-      //                       });
-        
-
-      //   res.status(200).json(fitbitCronData);
-      // })
-      // .catch(function (error) {
-
-      //   res.status(500).json(error);
-      // }) 
-
-      //end of getting data from fitbit
-
-      console.log("sensor ID " + sensorid);
-       
-
-           console.log("hello at " + new Date());
+        } else {
+            res.redirect('/');
+        }
     });
-  }
-}
-
-    console.log("userCredentials.userId     " +  userCredentials.userId);
-    // console.log("userCredentials.accessToken   " + userCredentials.accessToken );
-  //   function reAuthFitbit(req, res){
-  //   if (reauth) {
-  //     ModelName.findOne({ user: user }, function (err, fb) {
-  //     var option = {
-  //       url: "https://api.fitbit.com/oauth2/token",
-  //       headers: {
-  //         'Authorization' : 'Basic' + userCredentials.refreshToken,
-  //         'Content-Type' : "application/x-www-form-urlencoded"
-  //       },
-  //       method: 'POST',
-  //       form: {
-  //         "grant_type" : 'refresh_token',
-  //         "refresh_token" : fb.refresh_token
-  //       }
-  //     }
-  //     request(option,function(error,response,body){
-  //       var b = JSON.parse(body);
-
-  //       if (!error && response.statusCode == 200) {
-  //         Fitbit.findOne({user : user}, function(err, fb) {
-  //           fb.access_token = b.access_token;
-  //           fb.refresh_token = b.refresh_token;
-  //           fb.save();
-  //         });
-
-  //         return b.access_token
-  //         }
-  //     });
-  //   })}   
-  // }
-  // expires_in =31536000;
-
-
-    BASE_OPTIONS = {
-      method: 'GET',
-      headers: {
-        Authorization: 'Bearer ' + userCredentials.accessToken
- 
-      }
-    };
-
-    REFRESH_OPTIONS = {
-      method : 'GET',
-      headers: {
-        Authorization: 'Basic' + userCredentials.refreshToken
-      }
-    };
 
 
 
-// app.get('/data',  function (req, res) {
-   
+    // GET FITBIT DATA //
 
+    app.get('/api/v1/data', function(req, res) {
 
+        if (!req.user) {
+            res.status(500);
+        }
 
-
-// //       var list = fitbitData.heartRateToday;
-// // for(var index in list)
-// // {
-// //     var obj = list[index];
-// //     var name = obj["name"];
-// // }
-
-  
-//         request({
-//   uri: '/data?userid=/' + req.user.profile.id + '&heartRate=' + fitbitData.profile.user.fullName,
-//   method: "GET",
-//   timeout: 10000,
-//   followRedirect: true,
-//   maxRedirects: 10
-// }, function(error, response, body) {
-//   if (!error && response.statusCode == 200){
-//   console.log(body);
-//   }
-// });
-    
-//     // res.redirect('/data?userid=/' + req.user.profile.id + '&heartRate=' + fitbitData.profile.user.fullName);  
-   
-//   });
-    
-
-
-
-
-
-    
-    var currentTime = new Date(); // for now
-    var hour =      currentTime.getHours();
-    var minute = currentTime.getMinutes();
-
-      // var cronCurrentTime = new Date();
-      
-      // var cronHour =      cronCurrentTime.getHours();
-      
-      // var cronMinute = cronCurrentTime.getMinutes();
-      
-      // heartRateCronOptions         = _.cloneDeep(BASE_OPTIONS);
-
-      // heartRateCronOptions.url         = FITBIT_BASE_URL + '/activities/heart/date/today/1d/1sec/time/'+(cronHour-1) + ':'+(cronMinute-10)+ '/'+cronHour+':'+cronMinute+'.json';
-
-
-    var profileOptions           = _.cloneDeep(BASE_OPTIONS);
-    profileOptions.url           = FITBIT_BASE_URL + '/profile.json';
-    
-    var activitiesTodayOptions   = _.cloneDeep(BASE_OPTIONS);
-    activitiesTodayOptions.url   = FITBIT_BASE_URL + '/activities/date/today.json';
-
-     heartRateOptions         = _.cloneDeep(BASE_OPTIONS);
-    // heartRateOptions.url         = FITBIT_BASE_URL + '/activities/heart/date/2016-03-23/1d/1sec/time/00.00/00.01.json';
-    heartRateOptions.url         = FITBIT_BASE_URL + '/activities/heart/date/today/1d/1sec/time/00:00/'+ hour+':'+minute+'.json';
-
-    // heartRateOptions.url         = FITBIT_BASE_URL + '/activities/heart/date/today/1d/1min/time/00:00/00:02.json';
-
-
-    var heartStreamingData       = _.cloneDeep(BASE_OPTIONS);
-    // heartStreamingData.url       =  FITBIT_BASE_URL + '/activities/heart/date/today/1d/1sec/time/00:20/00:30.json';
-  
-      // heartStreamingData.url       =  FITBIT_BASE_URL + '/activities/heart/date/2016-02-23/today/1min.json';
-
-      heartStreamingData.url       =  FITBIT_BASE_URL + '/activities/heart/date/today/1m.json';
-
-      //GET https://api.fitbit.com/1/user/-/activities/heart/date/[date]/[end-date]/[detail-level]/time/[start-time]/[end-time].json
-
-    var stepsOptions             = _.cloneDeep(BASE_OPTIONS);
-    stepsOptions.url             = FITBIT_BASE_URL + '/activities/steps/date/today/7d.json';
-    
-    var veryActiveMinutesOptions = _.cloneDeep(BASE_OPTIONS);
-    veryActiveMinutesOptions.url = FITBIT_BASE_URL + '/activities/minutesVeryActive/date/today/7d.json';
-    
-    var activitiesOptions        = _.cloneDeep(BASE_OPTIONS);
-    activitiesOptions.url        = FITBIT_BASE_URL + '/activities.json';
-
-   
-    Promise.props({
-        profile: BRequest(profileOptions),
-        activitiesToday: BRequest(activitiesTodayOptions),
-        heartRateToday: BRequest(heartRateOptions),
-      
-        heartStreamingData: BRequest(heartStreamingData),
-        steps: BRequest(stepsOptions),
-        veryActiveMinutes: BRequest(veryActiveMinutesOptions),
-        activities: BRequest(activitiesOptions)
-      })
-      .then(function (results) {
-
-        fitbitData = {
-          profile: JSON.parse(results.profile.body),
-          activitiesToday: JSON.parse(results.activitiesToday.body),
-          heartRateToday: JSON.parse(results.heartRateToday.body),
-        
-          heartStreamingData: JSON.parse(results.heartStreamingData.body),
-          steps: JSON.parse(results.steps.body),
-          veryActiveMinutes: JSON.parse(results.veryActiveMinutes.body),
-          activities: JSON.parse(results.activities.body)
+        userCredentials = {
+            userId: req.user.profile.id,
+            accessToken: req.user.accessToken,
+            refreshToken: req.user.refreshToken,
+            expires_in: 3600
         };
-          // console.log(typeof kinesis.update);
-          // console.log("-0-0-0-0-0-0-0-0-0------     "+fitbitData.profile.user.memberSince);
-          // console.log("-0-0-0-0-0-0-0-0-0------     "+JSON.stringify(fitbitData.heartRateToday));
-          //change(fitbitData.heartRateToday);
-          // foo.foo(fitbitData.heartRateToday);
 
-
-
-        
-        var arr = JSON.stringify(fitbitData.heartRateToday);
-        // console.log(arr + "-- arr");
-
-        var str = arr.replace(/"activities-heart":/g, '"activitiesOfHeart":');
-        str = str.replace(/"activities-heart-intraday":/g, '"activitiesHeartIntraday":')
-
-        fitbitData.heartRateToday = str;
-        // console.log("str     "+str);
-        console.log("before str");
-        // console.log(str);
-
-         var jiyo = schedule.scheduleJob('*/30 * * * * *', function(){
-          sensorid = userCredentials.userId;
-          kinesis.update(fitbitData, fitbitData.heartRateToday, sensorid);
-                console.log('The answer to life, the universe, and everything!');
-
-        //         var arr2 = JSON.stringify(fitbitData.heartRateCronToday);
-
-        //          var str2 = arr2.replace(/"activities-heart":/g, '"activitiesOfHeart":');
-
-        //          str2 = str2.replace(/"activities-heart-intraday":/g, '"activitiesHeartIntraday":')
-
-        // fitbitData.heartRateCronToday = str2;
-        
-        // console.log("str2      " + str2);
-        
-        // var value = JSON.parse(heartRateCronToday);
-
-      // var value3 = JSON.stringify(fitbitData.heartRateCronToday);
-
-      // console.log("-0--0-0-0--3-3-3--3-3-3-3-3-3-3-3-3-3-3------------                         \n"+ value3);
-
-       var cronCurrentTime = new Date();
-      
-      var cronHour =      cronCurrentTime.getHours();
-      
-      var cronMinute = cronCurrentTime.getMinutes();
-        
-      var yesterday = cronCurrentTime.getDate()-1 ;
-
-      var yesterdayMonth = cronCurrentTime.getMonth() + 1;
-
-      var yesterdayYear = cronCurrentTime.getFullYear();
-
-       if (yesterdayMonth < 10){ yesterdayMonth = '0' + yesterdayMonth;}
-    if (yesterday < 10) {day = '0' + yesterday; }
-
-    var yes = [yesterdayYear, yesterdayMonth, yesterday].join('-');
-
-    //   function formatDate() {
-    //     console.log("heyya");
-    // var d = new Date(),
-    //     month = '' + (d.getMonth() + 1),
-    //     day = '' + (d.getDate() -1),
-    //     year = d.getFullYear();
-
-    // if (month.length < 2) month = '0' + month;
-    // if (day.length < 2) day = '0' + day;
-
-    // return [year, month, day].join('-');
-    //         }
- 
-    console.log(yes + "yes   ")
-
-      
-      heartRateCronOptions2         = _.cloneDeep(BASE_OPTIONS);
-
-      if(count === 0){
-        console.log("it comes inside count ===0");
-             // heartRateCronOptions2         = _.cloneDeep(BASE_OPTIONS);
-      heartRateCronOptions2.url         = FITBIT_BASE_URL + '/activities/heart/date/'+ yes +'/1d/1min/time/00:00/'+cronHour+':'+cronMinute+'.json';
-
-      // heartRateCronOptions2.url         = FITBIT_BASE_URL + '/activities/heart/date/2016-04-24/1d/1min/time/00:00/'+cronHour+':'+cronMinute+'.json';
-      console.log("it comes inside count ===0 after .url    " );
-      count++;
-       console.log("count inside if ==    "+count);
-    }else{
-                 // heartRateCronOptions2         = _.cloneDeep(BASE_OPTIONS);
-        heartRateCronOptions2.url         = FITBIT_BASE_URL + '/activities/heart/date/'+ yes +'/1d/1min/time/00:00/'+cronHour+':'+cronMinute+'.json';
-            // heartRateCronOptions2.url         = FITBIT_BASE_URL + '/activities/heart/date/today/1d/1sec/time/'+ previousHour + ':'+previousMinute+ '/'+cronHour+':'+cronMinute+'.json';
-            // console.log("  previousHour   " + previousHour + "  previousMinute   "+  previousMinute);
-            console.log("   cronHour" + cronHour + "    cronMinute    " + cronMinute);
-            count++;
-            console.log("count inside else =     "+count);
-
-    }
-
-    // console.log("heartRateCronOptions2   "  + JSON.stringify(heartRateCronOptions2));
-       Promise.props({
        
-        heartRateCronToday2 : BRequest(heartRateCronOptions2)
-      })
-      .then(function (results) {
+        // console.log(userCredentials.refreshToken);
 
-        fitbitCronData = {
-        
-          heartRateCronToday2: JSON.parse(results.heartRateCronToday2.body)
+        function cronJob(fitbitData) {
+            if (userCredentials.userId) {
+                console.log("here");
+
+                var cron = schedule.scheduleJob('* * * * *', function() {
+                    var user = fitbitData.profile.user.fullName;
+                    var sensorid = userCredentials.userId;
+
+                    var date = new Date();
+
+
+
+
+                });
+            }
+        }
+        BASE_OPTIONS = {
+            method: 'GET',
+            headers: {
+                Authorization: 'Bearer ' + userCredentials.accessToken
+
+            }
         };
-      })
-     //  var value2 = JSON.stringify(fitbitCronData);
-     var user = fitbitData.profile.user.fullName;
-     var sensorid = userCredentials.userId;
-     // console.log(sesnorid);
 
-     //          var array = JSON.stringify(fitbitCronData);
-     //          // console.log("array -----   "+array);
-     //            if(array !== undefined){
-     //              // console.log("array inside if " + array);
-     //             var stringo = array.replace(/"activities-heart":/g, '"activitiesOfHeart":');
+        REFRESH_OPTIONS = {
+            method: 'GET',
+            headers: {
+                Authorization: 'Basic ' + userCredentials.refreshToken
+            }
+        };
 
-     //             stringo = stringo.replace(/"activities-heart-intraday":/g, '"activitiesHeartIntraday":')
-     //             // console.log("stringo " + stringo);
-     //    fitbitCronData.heartRateCronToday2 = stringo;
+        var currentTime = new Date(); // for now
+        var hour = currentTime.getHours();
+        var minute = currentTime.getMinutes();
+        // heartRateCronOptions         = _.cloneDeep(BASE_OPTIONS);
 
-     //     // console.log("fitbitCronData    " + fitbitCronData.heartRateCronToday2);
-
-     // var check = fitbitCronData.heartRateCronToday2;
-     //  // console.log(check.activitiesHeartIntraday.dataset[0].time);
-     //        // var check2 = check.activitiesOfHeart[0].value;
-
-     //        // var check3 = JSON.parse(check);
-
-     //        // var check4 = check3.activitiesOfHeart[0].value;
-     //        // console.log("check 2 " + check2);
-     //        // console.log("check  " + check);
-     //        // console.log("activities length  " + check3.activitiesOfHeart[0].value);
-     //      }
-
-     // console.log( "fitbitCronData      "+ JSON.stringify(fitbitCronData));
+        // heartRateCronOptions.url         = FITBIT_BASE_URL + '/activities/heart/date/today/1d/1sec/time/'+(cronHour-1) + ':'+(cronMinute-10)+ '/'+cronHour+':'+cronMinute+'.json';
 
 
-  
-     if(fitbitCronData !== undefined)
-     {
-       var date = new Date();
+        var profileOptions = _.cloneDeep(BASE_OPTIONS);
+        profileOptions.url = FITBIT_BASE_URL + '/profile.json';
 
-        // var array = JSON.stringify(fitbitCronData.heartRateCronToday2);
-         var array = JSON.stringify(fitbitCronData.heartRateCronToday2);
-         // console.log(array + "-----------------------");
-        var str = array.replace(/"activities-heart":/g, '"activitiesOfHeart":');
-   
-        str = str.replace(/"activities-heart-intraday":/g, '"activitiesHeartIntraday":');
+        var activitiesTodayOptions = _.cloneDeep(BASE_OPTIONS);
+        activitiesTodayOptions.url = FITBIT_BASE_URL + '/activities/date/today.json';
 
-        fitbitCronData.heartRateCronToday2 = str;
+        heartRateOptions = _.cloneDeep(BASE_OPTIONS);
+        // heartRateOptions.url         = FITBIT_BASE_URL + '/activities/heart/date/2016-03-23/1d/1sec/time/00.00/00.01.json';
+        heartRateOptions.url = FITBIT_BASE_URL + '/activities/heart/date/today/1d/1sec/time/00:00/' + hour + ':' + minute + '.json';
 
-        var value = JSON.parse(fitbitCronData.heartRateCronToday2);
-            console.log('value ' + JSON.stringify(value)  + "----------0o-0o-0o-0o-0o");
+        // heartRateOptions.url         = FITBIT_BASE_URL + '/activities/heart/date/today/1d/1min/time/00:00/00:02.json';
 
-            // if(value.hasOwnProperty('activitiesOfHeart') || value.activitiesOfHeart.hasOwnProperty('value')){
-              // if(fitbitCronData.heartRateCronToday2["activities-heart-intraday"].dataset.length > 0 && fitbitCronData.heartRateCronToday2["activities-heart-intraday"].dataset.every(e => !!e["time"])){
 
-  // if (fitbitCronData.heartRateCronToday2["activities-heart-intraday"].dataset[0] !== undefined && fitbitCronData.heartRateCronToday2["activities-heart-intraday"].dataset[0].time !== undefined){
-          
+        var heartStreamingData = _.cloneDeep(BASE_OPTIONS);
+        // heartStreamingData.url       =  FITBIT_BASE_URL + '/activities/heart/date/today/1d/1sec/time/00:20/00:30.json';
 
-            if(value !== undefined){
-                   // var checkValidity = function (value) {
-              //             return value.indexOf('activitiesHeartIntraday') > 0;
-              //         }
-                    if(! value.hasOwnProperty('categories')){
+        // heartStreamingData.url       =  FITBIT_BASE_URL + '/activities/heart/date/2016-02-23/today/1min.json';
 
-                    if (value.activitiesHeartIntraday.dataset[0] && value.activitiesHeartIntraday.dataset[0].time){
-              // if(value.activitiesHeartIntraday.dataset.length > 0 && value.activitiesHeartIntraday.dataset.every(e => !!e["time"])){
-              console.log("inside if of hasOwnProperty");
-            if(value.activitiesOfHeart[0].value != undefined){
-            // var value2 = value.activitiesOfHeart[0].value;
-             // console.log('value \n \n \n' + JSON.stringify(value));
-            var value2 = value.activitiesHeartIntraday.dataset[value.activitiesHeartIntraday.dataset.length - 1].value;
+        heartStreamingData.url = FITBIT_BASE_URL + '/activities/heart/date/today/1m.json';
 
-            // console.log("value2 -------------------------------      "+value2);
+        //GET https://api.fitbit.com/1/user/-/activities/heart/date/[date]/[end-date]/[detail-level]/time/[start-time]/[end-time].json
 
-            var value3 = value.activitiesHeartIntraday.dataset[value.activitiesHeartIntraday.dataset.length - 1].time;
-                    console.log("value3 -------------------------------      "+value3);
-                    // console.log("value3.length-----------     " + value.activitiesHeartIntraday.dataset.length);
-                  
-                  var result = value3.split(':');
-                  console.log("result  " + result);
+        // var stepsOptions             = _.cloneDeep(BASE_OPTIONS);
+        // stepsOptions.url             = FITBIT_BASE_URL + '/activities/steps/date/today/7d.json';
 
-                        request.post('http://ec2-52-8-186-40.us-west-1.compute.amazonaws.com/fitbitdata',{ json: {  
-                                    "username" : user,
-                                    "fitbitUsername" : sensorid,
-                                    "healthdata" : {
-                                        "timestamp" : date,
-                                        "value" : value2
-                                    },
-                            } 
-                        },
-                            function (error, response, body) {
-                                if (!error && response.statusCode == 200) {
-                                    console.log(body);
-                                    console.log("------=-=-=--=-=-=    ");
-                                }
-                            });
+        // var veryActiveMinutesOptions = _.cloneDeep(BASE_OPTIONS);
+        // veryActiveMinutesOptions.url = FITBIT_BASE_URL + '/activities/minutesVeryActive/date/today/7d.json';
 
-                    previousHour = result[0];
-                    previousMinute = result[1];
-                    console.log("previousHour " + previousHour);
-                    console.log("previousMinute " + previousMinute);
+        var activitiesOptions = _.cloneDeep(BASE_OPTIONS);
+        activitiesOptions.url = FITBIT_BASE_URL + '/activities.json';
+
+
+        Promise.props({
+                profile: BRequest(profileOptions),
+
+                activitiesToday: BRequest(activitiesTodayOptions),
+
+                heartRateToday: BRequest(heartRateOptions),
+
+                heartStreamingData: BRequest(heartStreamingData),
+
+                activities: BRequest(activitiesOptions)
+            })
+            .then(function(results) {
+
+                fitbitData = {
+                    profile: JSON.parse(results.profile.body),
+
+                    activitiesToday: JSON.parse(results.activitiesToday.body),
+
+                    heartRateToday: JSON.parse(results.heartRateToday.body),
+
+                    heartStreamingData: JSON.parse(results.heartStreamingData.body),
+
+                    activities: JSON.parse(results.activities.body)
+                };
+
+
+                var arr =  JSON.stringify(fitbitData.heartRateToday);
+                // console.log(arr);
+                var str = arr.replace(/"activities-heart":/g, '"activitiesOfHeart":');
+                str = str.replace(/"activities-heart-intraday":/g, '"activitiesHeartIntraday":')
+
+                fitbitData.heartRateToday = str;
+
+                //refresh access token
+                var Base64={_keyStr:"ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/=",encode:function(e){var t="";var n,r,i,s,o,u,a;var f=0;e=Base64._utf8_encode(e);while(f<e.length){n=e.charCodeAt(f++);r=e.charCodeAt(f++);i=e.charCodeAt(f++);s=n>>2;o=(n&3)<<4|r>>4;u=(r&15)<<2|i>>6;a=i&63;if(isNaN(r)){u=a=64}else if(isNaN(i)){a=64}t=t+this._keyStr.charAt(s)+this._keyStr.charAt(o)+this._keyStr.charAt(u)+this._keyStr.charAt(a)}return t},decode:function(e){var t="";var n,r,i;var s,o,u,a;var f=0;e=e.replace(/[^A-Za-z0-9+/=]/g,"");while(f<e.length){s=this._keyStr.indexOf(e.charAt(f++));o=this._keyStr.indexOf(e.charAt(f++));u=this._keyStr.indexOf(e.charAt(f++));a=this._keyStr.indexOf(e.charAt(f++));n=s<<2|o>>4;r=(o&15)<<4|u>>2;i=(u&3)<<6|a;t=t+String.fromCharCode(n);if(u!=64){t=t+String.fromCharCode(r)}if(a!=64){t=t+String.fromCharCode(i)}}t=Base64._utf8_decode(t);return t},_utf8_encode:function(e){e=e.replace(/rn/g,"n");var t="";for(var n=0;n<e.length;n++){var r=e.charCodeAt(n);if(r<128){t+=String.fromCharCode(r)}else if(r>127&&r<2048){t+=String.fromCharCode(r>>6|192);t+=String.fromCharCode(r&63|128)}else{t+=String.fromCharCode(r>>12|224);t+=String.fromCharCode(r>>6&63|128);t+=String.fromCharCode(r&63|128)}}return t},_utf8_decode:function(e){var t="";var n=0;var r=c1=c2=0;while(n<e.length){r=e.charCodeAt(n);if(r<128){t+=String.fromCharCode(r);n++}else if(r>191&&r<224){c2=e.charCodeAt(n+1);t+=String.fromCharCode((r&31)<<6|c2&63);n+=2}else{c2=e.charCodeAt(n+1);c3=e.charCodeAt(n+2);t+=String.fromCharCode((r&15)<<12|(c2&63)<<6|c3&63);n+=3}}return t}}
+
+                var concat = clientID + ":" + clientSecret;
+                var encoded = Base64.encode(concat);
+
+                var refresh = schedule.scheduleJob('*/45 * * * *', function() {
+                    try {
+                        console.log("inside try block ");
+                        request({
+                            url: 'https://api.fitbit.com/oauth2/token',
+                            method: 'POST',
+                            headers: {
+                                Authorization: "Basic " + encoded
+                            },
+                            form: {
+                                grant_type: 'refresh_token',
+                                refresh_token: userCredentials.refreshToken
+                            }
+                        }, function(error, response, body) {
+                            if (error) {
+                                console.log(error);
+                            } else {
+                                var b = JSON.parse(body);
+                                userCredentials.accessToken = b.access_token;
+                                userCredentials.refreshToken = b.refresh_token;
+                                // console.log(userCredentials.refreshToken);
+                                console.log(response.statusCode);
+
+                            }
+                        });
+
+
+                    } catch (err) {
+                        console.log('error refreshing user token', err);
+                    };
+
+                });
+
+
+                var pushData = schedule.scheduleJob('* * * * *', function() {
+                    sensorid = userCredentials.userId;
+                    // console.log(userCredentials.refreshToken);
+                    // console.log(BASE_OPTIONS);
+                    var cronCurrentTime = new Date();
+
+                    var cronHour = cronCurrentTime.getHours();
+
+                    var cronMinute = cronCurrentTime.getMinutes();
+
+                    var yesterday = cronCurrentTime.getDate() - 1;
+
+                    var yesterdayMonth = cronCurrentTime.getMonth() + 1;
+
+                    var yesterdayYear = cronCurrentTime.getFullYear();
+
+                    if (yesterdayMonth < 10) {
+                        yesterdayMonth = '0' + yesterdayMonth;
                     }
-                  }
-                }
-              }
-                  console.log("outside if of hasOwnProperty");
-             }
+                    if (yesterday < 10) {
+                        yesterday = '0' + yesterday;
+                    }
 
-    
-     // console.log("value2 -------------------------------      "+value2);
-
-//mongodb request
-
-      // request.post('http://ec2-52-8-186-40.us-west-1.compute.amazonaws.com/fitbitdata',{ json: {  
-      //                               "username" : user,
-      //                               "fitbitUsername" : sensorid,
-      //                               "healthdata" : {
-      //                                   "timestamp" : date,
-      //                                   "value" : value2
-      //                               },
-      //                       } 
-      //                   },
-      //                       function (error, response, body) {
-      //                           if (!error && response.statusCode == 200) {
-      //                               console.log(body);
-      //                               console.log("------=-=-=--=-=-=    ");
-      //                           }
-      //                       });
-
-      //end of mongoDB request    
-            // previousHour = cronHour;
-            // previousMinute = cronMinute;
-
-          });
-       
-        // kinesis.update(fitbitData, fitbitData.heartRateToday);
-        
-        res.status(200).json(fitbitCronData);
-      })
-      .catch(function (error) {
-
-        res.status(500).json(error);
-      }) 
-  });
-  
-
-      
-
-
-// //get fitbit data for cron of heart rate
-      // var cronCurrentTime = new Date();
-      
-      // var cronHour =      cronCurrentTime.getHours();
-      
-      // var cronMinute = cronCurrentTime.getMinutes();
-      
-      // heartRateCronOptions         = _.cloneDeep(BASE_CRON_OPTIONS);
-
-      // heartRateCronOptions.url         = FITBIT_CRON_BASE_URL + '/activities/heart/date/today/1d/1min/time/00:00/'+ cronHour+':'+cronMinute+'.json';
-
-      //   Promise.props({
-       
-      //   heartRateCronToday: BRequest(heartRateCronOptions),
-       
-      // })
-      // .then(function (results) {
-
-      //   fitbitCronData = {
-         
-      //     heartRateCronToday: JSON.parse(results.heartRateCronToday.body),
-          
-      //   };
-      //     // console.log(typeof kinesis.update);
-      //     // console.log("-0-0-0-0-0-0-0-0-0------     "+fitbitData.profile.user.memberSince);
-      //     // console.log("-0-0-0-0-0-0-0-0-0------     "+JSON.stringify(fitbitData.heartRateToday));
-      //     //change(fitbitData.heartRateToday);
-      //     // foo.foo(fitbitData.heartRateToday);
-
-
-
-        
-      //   var arr2 = JSON.stringify(fitbitData.heartRateToday);
-
-
-      //   var str = arr2.replace(/"activities-heart":/g, '"activitiesOfHeart":');
-      //   str = str.replace(/"activities-heart-intraday":/g, '"activitiesHeartIntraday":')
-
-      //   fitbitCronData.heartRateCronToday = str;
-        
-      //   console.log(str);
-      //   kinesis.update(fitbitCronData, fitbitCronData.heartRateCronToday);
-        
-      //   res.status(200).json(fitbitData);
-      // })
-      // .catch(function (error) {
-
-      //   res.status(500).json(error);
-      // }) 
-
-
-// end of cron for fitbit data
-/*
+                    var yes = [yesterdayYear, yesterdayMonth, yesterday].join('-');
 
 
 
 
-*/
+                    heartRateCronOptions2 = _.cloneDeep(BASE_OPTIONS);
+
+                    if (count === 0) {
+                        // heartRateCronOptions2         = _.cloneDeep(BASE_OPTIONS);
+                        heartRateCronOptions2.url = FITBIT_BASE_URL + '/activities/heart/date/' + yes + '/1d/1min/time/00:00/' + cronHour + ':' + cronMinute + '.json';
+
+                        // heartRateCronOptions2.url         = FITBIT_BASE_URL + '/activities/heart/date/2016-04-24/1d/1min/time/00:00/'+cronHour+':'+cronMinute+'.json';
+                        count++;
+                    } else {
+                        // heartRateCronOptions2         = _.cloneDeep(BASE_OPTIONS);
+                        heartRateCronOptions2.url = FITBIT_BASE_URL + '/activities/heart/date/' + yes + '/1d/1min/time/00:00/' + cronHour + ':' + cronMinute + '.json';
+                        // heartRateCronOptions2.url         = FITBIT_BASE_URL + '/activities/heart/date/today/1d/1sec/time/'+ previousHour + ':'+previousMinute+ '/'+cronHour+':'+cronMinute+'.json';
+                        count++;
+
+                    }
+
+                    Promise.props({
+
+                            heartRateCronToday2: BRequest(heartRateCronOptions2)
+                        })
+                        .then(function(results) {
+
+                            fitbitCronData = {
+
+                                heartRateCronToday2: JSON.parse(results.heartRateCronToday2.body)
+                            };
+                        })
+                    var user = fitbitData.profile.user.fullName;
+                    var sensorid = userCredentials.userId;
+
+
+                    if (fitbitCronData !== undefined) {
+                        var date = new Date();
+
+                        var array =  JSON.stringify(fitbitCronData.heartRateCronToday2);
+                        var str = array.replace(/"activities-heart":/g, '"activitiesOfHeart":');
+
+                        str = str.replace(/"activities-heart-intraday":/g, '"activitiesHeartIntraday":');
+
+                        fitbitCronData.heartRateCronToday2 = str;
+
+                        var value = JSON.parse(fitbitCronData.heartRateCronToday2);
+
+
+                        if (value !== undefined) {
+                            if (!value.hasOwnProperty('categories')) {
+
+                                if (value.activitiesHeartIntraday.dataset[0] && value.activitiesHeartIntraday.dataset[0].time) {
+                                    // console.log("inside if of hasOwnProperty");
+                                    if (value.activitiesOfHeart[0].value != undefined) {
+                                        var value2 = value.activitiesHeartIntraday.dataset[value.activitiesHeartIntraday.dataset.length - 1].value;
+
+
+                                        var value3 = value.activitiesHeartIntraday.dataset[value.activitiesHeartIntraday.dataset.length - 1].time;
+                                        console.log("value2 " + value2);
+                                        var result = value3.split(':');
+
+
+                                        kinesis.update(fitbitData, fitbitData.heartRateToday, sensorid, value2);
 
 
 
-  // app.get('/user', function(req, res){
-  //     userid = req.param.userId;
-  //     heartData = fitbitData.heartRateToday.activities-heart[0];
-  // });
 
-  // app.get("/refresh",function(req,res){
-  //   reauth = true;
-  //   reAuthFitbit(req.user);
-  //   reauth = false
-  // });
-  // LOG OUT //
+                                        previousHour = result[0];
+                                        previousMinute = result[1];
+
+                                    }
+                                }
+                            }
+                        }
+                        // console.log("outside if of hasOwnProperty");
+                    }
+                });
 
 
+                res.status(200).json(fitbitCronData);
+            })
+            .catch(function(error) {
 
-    // var j = schedule.scheduleJob('* * * * * *', function(){
-    //         var user = "user1";
-    //         var sensorid = userCredentials.userId;
+                res.status(500).json(error);
+            })
+    });
 
-    //         console.log("sensor ID " + sensorid)
-    //        // request.post('http://ec2-54-67-123-247.us-west-1.compute.amazonaws.com/api/fitbitdata',{ json: {  
-    //        //                          "username" : user,
-    //        //                          "fitbitUsername" : sensorid,
-    //        //                          "healthdata" : {
-    //        //                              "timestamp" : date,
-    //        //                              "value" : value2
-    //        //                          },
-    //        //                  } 
-    //        //              },
-    //        //                  function (error, response, body) {
-    //        //                      if (!error && response.statusCode == 200) {
-    //        //                          console.log(body);
-    //        //                          console.log("------=-=-=--=-=-=    ");
-    //        //                      }
-    //        //                  });
-        
-    //        console.log("hello at " + new Date());
-    // });
-
-  app.get('/auth/logout', function (req, res) {
-    req.logout();
-    console.log('You have logged out');
-    res.redirect('/#');
-  });
+    app.get('/auth/logout', function(req, res) {
+        req.logout();
+        console.log('You have logged out');
+        res.redirect('/#');
+    });
 
 };
-
-
-

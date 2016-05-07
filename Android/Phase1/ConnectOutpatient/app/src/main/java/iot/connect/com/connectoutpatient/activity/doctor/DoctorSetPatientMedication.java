@@ -73,7 +73,7 @@ public class DoctorSetPatientMedication extends AppCompatActivity {
         actionBarDrawerToggle.syncState();
         setTitle("Set Medication");
         List<String> rows = new ArrayList<>();
-        rows.add("Set Medication");
+        rows.add("Dashboard");
         rows.add("My Patients");
         rows.add("Set Medication");
         rows.add("Appointment");

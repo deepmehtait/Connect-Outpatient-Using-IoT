@@ -68,7 +68,8 @@ public class PatientDashboardActivity extends AppCompatActivity {
         List<String> rows = new ArrayList<>();
         rows.add("Dashboard");
         rows.add("My Medications");
-        rows.add("Settings");
+        rows.add("Appointment");
+        rows.add("Log Out");
         String email=sharedpreferences.getString("email","");
         String pic=sharedpreferences.getString("profilepic","http://www.sourcecoi.com/sites/default/files/team/defaultpic_0.png");
         DrawerAdapterPatient drawerAdapter = new DrawerAdapterPatient(getApplicationContext(),rows,email,pic);

@@ -43,6 +43,9 @@
         <activity android:name=".activity.patient.PatientMedication">
 
         </activity>
+        <activity android:name=".activity.patient.PatientAppointment">
+
+        </activity>
         <activity android:name=".activity.doctor.DoctorPatientDetail">
 
         </activity>
