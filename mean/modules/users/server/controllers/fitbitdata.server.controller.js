@@ -29,4 +29,25 @@
     };
 
 
+    /**
+     * Get user's fitbit data
+     */
+    exports.getFitBitData = function (req, res) {
+        var userId = req.params.patientId;
+        Fitbitdata.find({ username: userId },'healthdata', function (err, data) {
+                if (err) {
+                    return res.status(400).send({
+                        message: errorHandler.getErrorMessage(err)
+                    });
+                } else if(data && data[0]) {
+                    res.json({ 'healthdata' : data[0].healthdata.slice(-10) });
+                }
+                else{
+                    res.json({ 'Result': 'No data found!'  });
+                }
+            });
+    };
+
+
+
 

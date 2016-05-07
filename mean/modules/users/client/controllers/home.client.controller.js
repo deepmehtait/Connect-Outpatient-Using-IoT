@@ -43,8 +43,8 @@ angular.module('core').controller('HomeController', ['$scope', '$http', 'Socket'
 
         //Live Heart Rate data
         $scope.series = ['Heart Rate'];
-        var tempList = [75, 73, 78];
-        $scope.labels = ['18:20', '18:25', '18:30'];
+        var tempList = [];
+        $scope.labels = [];
         $scope.data = [tempList];
         $scope.chartOptions = {
             scaleOverride: true,
@@ -54,9 +54,27 @@ angular.module('core').controller('HomeController', ['$scope', '$http', 'Socket'
             scaleStartValue: 35
         };
 
+        $http.get('/fitbitdata/' + Authentication.user.username).success(function (response) {
+            if(response && response.healthdata) {
+                for (var i = 0; i < response.healthdata.length; i++) {
+                    var tempTimestamp = [];
+                    var finalTimestamp = "";
+                    if (response.healthdata[i].timestamp) {
+                        tempTimestamp = response.healthdata[i].timestamp.split("T")[1];
+                        if (tempTimestamp) {
+                            var res1 = tempTimestamp.split(":");
+                            finalTimestamp = res1[0] + ":" + res1[1];
+                        }
+                    }
+                    $scope.labels.push(finalTimestamp);
+                    tempList.push(response.healthdata[i].value);
+                }
+            }
+        }).error(function (response) {
+            $scope.error = response.message;
+        });
+
         Socket.on('FitbitData.received', function (data) {
-            console.log(data.value);
-            console.log(data.timestamp);
             $scope.chartOptions.animation = false;
             var tempTimestamp = [];
             var finalTimestamp = "";
