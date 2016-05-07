@@ -71,6 +71,13 @@ import iot.connect.com.connectoutpatient.utils.AppStatus;
 
             }
             else if(location==2){
+
+                String rowText = rows.get(location);
+                holder.textView.setText(rowText);
+                Picasso.with(context).load(R.drawable.ic_view_agenda_black_24dp).into(holder.imageView);
+
+            }
+            else if(location==3){
                 String rowText = rows.get(location);
                 holder.textView.setText(rowText);
                 Picasso.with(context).load(R.drawable.ic_exit_to_app_black_24dp).into(holder.imageView);
@@ -122,7 +129,12 @@ import iot.connect.com.connectoutpatient.utils.AppStatus;
                             i.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
                             itemView.getContext().startActivity(i);
                         }
-                        else if(position ==2){
+                        else if(position==2){
+                            Intent i=new Intent(itemView.getContext(),PatientAppointment.class);
+                            i.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+                            itemView.getContext().startActivity(i);
+                        }
+                        else if(position ==3){
                             /*Intent i=new Intent(itemView.getContext(),PatientSettingsActivity.class);
                             i.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
                             itemView.getContext().startActivity(i);*/

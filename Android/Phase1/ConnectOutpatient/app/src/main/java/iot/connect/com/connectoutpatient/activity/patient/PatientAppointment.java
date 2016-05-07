@@ -17,42 +17,37 @@ import android.widget.Toast;
 import com.android.volley.Request;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
-import com.android.volley.toolbox.JsonArrayRequest;
 import com.android.volley.toolbox.JsonObjectRequest;
 import com.android.volley.toolbox.Volley;
 import com.google.gson.Gson;
-import com.google.gson.JsonObject;
 
-import org.json.JSONArray;
-import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
 import java.util.List;
 
 import iot.connect.com.connectoutpatient.R;
-import iot.connect.com.connectoutpatient.activity.adapter.DaysOfWeekAdapter;
-import iot.connect.com.connectoutpatient.activity.doctor.adapter.DoctorMyPatientAdapter;
-import iot.connect.com.connectoutpatient.modals.DaysOfWeekData;
-import iot.connect.com.connectoutpatient.modals.MyPatientList;
-import iot.connect.com.connectoutpatient.modals.MyPatientListDetails;
-import iot.connect.com.connectoutpatient.modals.dayAndMedication;
+import iot.connect.com.connectoutpatient.activity.doctor.adapter.DoctorMyAppointment;
+import iot.connect.com.connectoutpatient.activity.patient.adapter.PatientMyAppointment;
+import iot.connect.com.connectoutpatient.modals.AppointmentParser;
 import iot.connect.com.connectoutpatient.utils.AppBaseURL;
 import iot.connect.com.connectoutpatient.utils.AppStatus;
 
 /**
- * Created by Deep on 23-Apr-16.
+ * Created by Deep on 06-May-16.
  */
-public class PatientMedication extends AppCompatActivity {
+public class PatientAppointment extends AppCompatActivity {
     DrawerLayout drawerLayout;
     Toolbar toolbar;
     RecyclerView recyclerView;
-    ListView dayMedication;
     SharedPreferences sharedpreferences;
+    ListView appListview;
+
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_patient_medications);
+        setContentView(R.layout.activity_patient_appointment);
+
         sharedpreferences = getSharedPreferences("ConnectIoT", getApplicationContext().MODE_PRIVATE);
         toolbar=(Toolbar)findViewById(R.id.toolbar);
         drawerLayout=(DrawerLayout)findViewById(R.id.drawer_layout);
@@ -61,13 +56,15 @@ public class PatientMedication extends AppCompatActivity {
         ActionBarDrawerToggle actionBarDrawerToggle=new ActionBarDrawerToggle(this,drawerLayout,toolbar,R.string.app_name,R.string.app_name);
         drawerLayout.addDrawerListener(actionBarDrawerToggle);
         actionBarDrawerToggle.syncState();
-        setTitle("My Medications");
+        setTitle("Appointment");
         List<String> rows = new ArrayList<>();
         rows.add("Dashboard");
         rows.add("My Medications");
         rows.add("Appointment");
         rows.add("Log Out");
-        String email=sharedpreferences.getString("email","");
+
+        final String email=sharedpreferences.getString("email","");
+        final String userName=sharedpreferences.getString("username","");
         String pic=sharedpreferences.getString("profilepic","http://www.sourcecoi.com/sites/default/files/team/defaultpic_0.png");
         DrawerAdapterPatient drawerAdapter = new DrawerAdapterPatient(getApplicationContext(),rows,email,pic);
         recyclerView.setAdapter(drawerAdapter);
@@ -76,42 +73,23 @@ public class PatientMedication extends AppCompatActivity {
 
 
 
-        dayMedication=(ListView)findViewById(R.id.DaysListView);
+        appListview=(ListView)findViewById(R.id.appointmentListView);
+
+
+        /// Get appointment for patient
         if (AppStatus.getInstance(getApplicationContext()).isOnline()) {
 
 
-            String URL = AppBaseURL.BaseURL + "medication/newpatient";
-
-            JsonArrayRequest jsonRequest = new JsonArrayRequest(Request.Method.GET, URL, (JSONObject) null, new Response.Listener<JSONArray>() {
+            String URL = AppBaseURL.BaseURL + "appointment/"+userName;
+            JsonObjectRequest jsonRequest = new JsonObjectRequest(Request.Method.GET, URL, (JSONObject) null, new Response.Listener<JSONObject>() {
 
                 @Override
-                public void onResponse(JSONArray response) {
+                public void onResponse(JSONObject response) {
                     // the response is already constructed as a JSONObject!
-                    ArrayList<dayAndMedication> dayAndMedications=new ArrayList<dayAndMedication>();
                     Log.d("Response-", response.toString());
-                    Log.d("Size", ""+response.length());
-                    for(int i=0;i<response.length();i++){
-                        JSONObject obj=response.optJSONObject(i);
-                        dayAndMedication dam=new dayAndMedication();
-                        try{
-                            dam.setName(obj.getString("name"));
-                            dam.setDosage(obj.getString("dosage"));
-                            dam.setCompany(obj.getString("company"));
-                            dam.setDay(obj.getString("day"));
-                            dam.setTime(obj.getString("time"));
-                        }catch (JSONException e){
-                            e.printStackTrace();
-                        }
-
-                        dayAndMedications.add(dam);
-                    }
-                    dayMedication.setAdapter(new DaysOfWeekAdapter(getApplicationContext(),dayAndMedications));
-                    //DaysOfWeekData daysOfWeekData=new DaysOfWeekData();
-                    //Gson gs = new Gson();
-
-                    //daysOfWeekData=gs.fromJson(response.toString(),DaysOfWeekData.class);
-                    //Log.d("Arrlis","Size = "+daysOfWeekData.getDaysofweek().size());
-                    //dayMedication.setAdapter(new DaysOfWeekAdapter(getApplicationContext(),daysOfWeekData.getDaysofweek()));
+                    Gson gs=new Gson();
+                    AppointmentParser appointmentParser=gs.fromJson(response.toString(),AppointmentParser.class);
+                    appListview.setAdapter(new PatientMyAppointment(getApplicationContext(),appointmentParser.getData()));
                 }
             }, new Response.ErrorListener() {
 
@@ -128,9 +106,7 @@ public class PatientMedication extends AppCompatActivity {
             Toast.makeText(getApplicationContext(), "Please Check Internet Connection", Toast.LENGTH_SHORT).show();
         }
 
-
     }
-
     // Handle back button event fired.
     @Override
     public void onBackPressed()
