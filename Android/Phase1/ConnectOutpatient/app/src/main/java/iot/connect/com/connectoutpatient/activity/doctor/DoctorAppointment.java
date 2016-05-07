@@ -120,4 +120,13 @@ public class DoctorAppointment extends AppCompatActivity {
         }
 
     }
+
+    // Handle back button event fired.
+    @Override
+    public void onBackPressed() {
+        // Go To Dashboard
+        Intent i = new Intent(getApplicationContext(), DoctorDashboardActivity.class);
+        i.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+        startActivity(i);
+    }
 }
