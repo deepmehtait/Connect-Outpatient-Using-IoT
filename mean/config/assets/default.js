@@ -21,7 +21,8 @@ module.exports = {
         'public/lib/Chart.js/Chart.js',
         'public/lib/angular-chart.js/dist/angular-chart.js',
         'public/lib/moment/moment.js',
-        'public/lib/angular-bootstrap-calendar/dist/js/angular-bootstrap-calendar-tpls.min.js',
+        'public/lib/owasp-password-strength-test/owasp-password-strength-test.js',
+        'public/lib/angular-bootstrap-calendar/dist/js/angular-bootstrap-calendar-tpls.min.js'
       ],
       tests: ['public/lib/angular-mocks/angular-mocks.js']
     },
