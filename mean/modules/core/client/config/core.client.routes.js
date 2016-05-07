@@ -19,7 +19,7 @@ angular.module('core').config(['$stateProvider', '$urlRouterProvider',
     })
     .state('home', {
       url: '/dashboard',
-      templateUrl: 'modules/core/client/views/home.client.view.html'
+      templateUrl: 'modules/users/client/views/home.client.view.html'
     })
     .state('not-found', {
       url: '/not-found',

@@ -12,6 +12,7 @@
     */
     exports.addFitBitData = function (req, res) {
         // Init Variables
+      var socketio = req.app.get('socketio');
       var fitbit_data = new Fitbitdata(req.body);
       var message = null;
       Fitbitdata.update({ fitbitUsername: fitbit_data.fitbitUsername },
@@ -21,6 +22,7 @@
                message: errorHandler.getErrorMessage(err)
              });
            } else {
+             socketio.emit('FitbitData.received', fitbit_data.healthdata);
              res.json({ 'Result': 'Fitbit data stored successfully' });
            }
          });

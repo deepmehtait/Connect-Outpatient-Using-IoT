@@ -59,7 +59,7 @@ module.exports = function (app, db) {
   }
   // Create a new Socket.io server
   var io = socketio.listen(server);
-
+  app.set('socketio', io);
   // Create a MongoDB storage object
   var mongoStore = new MongoStore({
     mongooseConnection: db.connection,
@@ -87,6 +87,8 @@ module.exports = function (app, db) {
         passport.initialize()(socket.request, {}, function () {
           passport.session()(socket.request, {}, function () {
             if (socket.request.user) {
+              //Change the socket id to username
+              socket.id = socket.request.user.username;
               next(null, true);
             } else {
               next(new Error('User is not authenticated'), false);
@@ -99,6 +101,7 @@ module.exports = function (app, db) {
 
   // Add an event listener to the 'connection' event
   io.on('connection', function (socket) {
+    console.log(socket.id);
     config.files.server.sockets.forEach(function (socketConfiguration) {
       require(path.resolve(socketConfiguration))(io, socket);
     });

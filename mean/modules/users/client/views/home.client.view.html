@@ -1,0 +1,65 @@
+<section ng-controller="HomeController">
+  <div class="row">
+    <div class="col-md-6">
+      <h3>Current Status</h3>
+      <div style="width: 500px;height: 750px;">
+      <canvas height="350" width="450"  id="line" class="chart chart-line" chart-data="data"
+              chart-labels="labels" chart-legend="true" chart-series="series" chart-options="chartOptions"
+              chart-click="onClick" >
+      </canvas>
+        <div class="panel panel-default">
+          <div class="panel-heading">Medication Schedule</div>
+          <table class="table">
+            <thead>
+            <tr>
+              <th>Name</th>
+              <th>Day</th>l
+              <th>Time</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr ng-repeat="cm in clientMedications">
+              <td>{{cm.name}}</td>
+              <td>{{cm.day}}</td>
+              <td>{{cm.time}}</td>
+            </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+    </div>
+    <div class="col-md-2">
+      <div class="panel panel-default" style="margin-top: 70px">
+        <div class="panel-heading">Daily Summary</div>
+        <div class="panel-body">
+          <!--<h3><span class="label label-info" >Minimum</span> &nbsp;&nbsp;&nbsp;&nbsp; 72</h3>
+          <h3><span class="label label-info" >Average</span> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;74</h3>
+          <h3><span class="label label-info">Maximum</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;78</h3>-->
+          <h5>Minimum &nbsp;&nbsp;&nbsp;<span class="badge">70</span></h5>
+          <h5>Average&nbsp;&nbsp;&nbsp;&nbsp; <span class="badge">74</span></h5>
+          <h5>Maximum&nbsp;&nbsp; <span class="badge">82</span></h5>
+        </div>
+    </div>
+    </div>
+    <div class="col-md-4" >
+      <!--<div class="panel panel-default" style="margin-top: 70px;">
+        <div class="panel-heading">Upcoming Appointments</div>
+        <mwl-calendar
+          view="calendarView"
+          view-date="calendarDate"
+          events="events"
+          view-title="MyTitle"
+          on-event-click="eventClicked(calendarEvent)"
+          on-event-times-changed="calendarEvent.startsAt = calendarNewEventStart; calendarEvent.endsAt = calendarNewEventEnd"
+          edit-event-html="'<i class=\'glyphicon glyphicon-pencil\'></i>'"
+          delete-event-html="'<i class=\'glyphicon glyphicon-remove\'></i>'"
+          on-edit-event-click="eventEdited(calendarEvent)"
+          on-delete-event-click="eventDeleted(calendarEvent)"
+          cell-is-open="true">
+        </mwl-calendar>
+
+      </div>-->
+    </div>
+  </div>
+</section>
