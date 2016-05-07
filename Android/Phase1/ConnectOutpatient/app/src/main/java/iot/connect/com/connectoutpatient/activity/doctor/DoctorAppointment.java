@@ -65,7 +65,7 @@ public class DoctorAppointment extends AppCompatActivity {
         rows.add("My Patients");
         rows.add("Set Medication");
         rows.add("Appointment");
-        rows.add("Settings");
+        rows.add("Log Out");
 
         String pic=sharedpreferences.getString("profilepic","http://www.sourcecoi.com/sites/default/files/team/defaultpic_0.png");
         DrawerAdapterDoctor drawerAdapter = new DrawerAdapterDoctor(getApplicationContext(), rows, email, pic);

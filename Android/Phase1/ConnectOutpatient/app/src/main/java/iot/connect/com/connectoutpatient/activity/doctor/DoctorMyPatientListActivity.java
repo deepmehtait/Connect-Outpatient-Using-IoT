@@ -62,7 +62,7 @@ public class DoctorMyPatientListActivity extends AppCompatActivity {
         rows.add("My Patients");
         rows.add("Set Medication");
         rows.add("Appointment");
-        rows.add("Settings");
+        rows.add("Log Out");
         final String email = sharedpreferences.getString("email", "");
         final String userName=sharedpreferences.getString("username","");
         String pic = sharedpreferences.getString("profilepic", "http://www.sourcecoi.com/sites/default/files/team/defaultpic_0.png");

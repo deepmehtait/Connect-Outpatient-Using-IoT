@@ -2,18 +2,23 @@ package iot.connect.com.connectoutpatient.activity.patient;
 
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.squareup.picasso.Picasso;
 
 import java.util.List;
 
 import iot.connect.com.connectoutpatient.R;
+import iot.connect.com.connectoutpatient.activity.MainActivity;
+import iot.connect.com.connectoutpatient.gcm.RegisterToken;
+import iot.connect.com.connectoutpatient.utils.AppStatus;
 
 
 /**
@@ -68,7 +73,7 @@ import iot.connect.com.connectoutpatient.R;
             else if(location==2){
                 String rowText = rows.get(location);
                 holder.textView.setText(rowText);
-                Picasso.with(context).load(R.drawable.ic_settings_black_24dp).into(holder.imageView);
+                Picasso.with(context).load(R.drawable.ic_exit_to_app_black_24dp).into(holder.imageView);
             }
         }
     }
@@ -118,9 +123,28 @@ import iot.connect.com.connectoutpatient.R;
                             itemView.getContext().startActivity(i);
                         }
                         else if(position ==2){
-                            Intent i=new Intent(itemView.getContext(),PatientSettingsActivity.class);
+                            /*Intent i=new Intent(itemView.getContext(),PatientSettingsActivity.class);
                             i.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
-                            itemView.getContext().startActivity(i);
+                            itemView.getContext().startActivity(i);*/
+                            SharedPreferences sharedpreferences;
+                            sharedpreferences = itemView.getContext().getSharedPreferences("ConnectIoT", itemView.getContext().MODE_PRIVATE);
+                            if (AppStatus.getInstance(itemView.getContext()).isOnline()) {
+                                RegisterToken rt = new RegisterToken();
+                                rt.unRegister(itemView.getContext());
+                                SharedPreferences.Editor editor = sharedpreferences.edit();
+                                editor.putString("LoggedIn", "null");
+                                editor.putString("role", "");
+                                editor.putString("username", "");
+                                editor.putString("profilepic", "");
+                                editor.putString("email", "");
+                                editor.commit();
+                                Intent i = new Intent(itemView.getContext(), MainActivity.class);
+                                i.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+                                itemView.getContext().startActivity(i);
+                            } else {
+                                // If no network connectivity notify user
+                                Toast.makeText(itemView.getContext(), "Please Check Internet Connection", Toast.LENGTH_SHORT).show();
+                            }
                         }
                         //Toast.makeText(itemView.getContext(),"post-"+position,Toast.LENGTH_SHORT).show();
                     }
