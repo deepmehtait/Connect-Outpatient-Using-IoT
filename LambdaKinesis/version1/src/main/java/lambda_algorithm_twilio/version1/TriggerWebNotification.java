@@ -6,6 +6,9 @@ import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.net.URL;
 import java.net.URLConnection;
+import java.util.LinkedHashMap;
+import java.util.Map;
+import java.util.Set;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -13,11 +16,31 @@ import org.json.JSONObject;
 import com.twilio.sdk.TwilioRestException;
 
 public class TriggerWebNotification {
+	private static final int medValue = 72;
 	private static int centerValue = 72;
-	private final static int delta = 9;
+	private static final int delta = 5;
+	private static int lastValue;
+	private static final int MAX_ENTRIES = 5;
 	
+	private static LinkedHashMap<String,Boolean> sensorMap = new LinkedHashMap<String,Boolean>(MAX_ENTRIES + 1, .75F, false) {
+		protected boolean removeEldestEntry(Map.Entry  eldest) {
+            return size() >  MAX_ENTRIES;
+         }
+      };
+	
+	private static LinkedHashMap<Integer,Integer> weightMap = new LinkedHashMap<Integer,Integer>(MAX_ENTRIES + 1, .75F, false) {
+		protected boolean removeEldestEntry(Map.Entry  eldest) {
+            return size() >  MAX_ENTRIES;
+         }
+      };
+    
 	public static void process(String value, String sensorID) throws Exception{
-		if(criticalEstimate(Integer.parseInt(value))){
+		if(!sensorMap.containsKey(sensorID)){
+			System.out.println("Adding Sensor ID: " + sensorID);
+			sensorMap.put(sensorID, true);
+		}
+		
+		if(criticalEstimate(Integer.parseInt(value)) && sensorMap.get(sensorID)){
 		  String url = "http://52.8.186.40/notification";
 		  String param = "{\"fitBitId\":\"" + sensorID + "\", \"value\":\"" + value + "\"}";
 		  String charset = "UTF-8"; 
@@ -41,28 +64,64 @@ public class TriggerWebNotification {
 		  JSONObject result= new JSONObject(responseStrBuilder.toString());    
 		  JSONObject patientObj = (JSONObject) result.get("patientInfo");
 		  JSONArray doctors = (JSONArray) result.get("doctorInfo");
+		  String patientName = patientObj.get("displayName").toString();
+		  String emergencyContact = patientObj.get("emergencyContactNumber").toString();
+		  String emergencyName = patientObj.get("emergencyContactName").toString();
+		  
 		  for(int i = 0; i < doctors.length(); i++){
-			  callTwilio(((JSONObject)doctors.get(i)).get("phoneNumber").toString(), value, patientObj.get("displayName").toString(), ((JSONObject)doctors.get(i)).get("displayName").toString());
+			  // Email Notification to Doctors 
+			  EmailNotification.emailDoctor(patientName, value, ((JSONObject)doctors.get(i)).get("displayName").toString(), emergencyContact, emergencyName);
+			  // Make Call and send Message to the Doctors
+			  callTwilio(((JSONObject)doctors.get(i)).get("phoneNumber").toString(), value, patientName, ((JSONObject)doctors.get(i)).get("displayName").toString());
 		  }
-		  callTwilio(patientObj.get("emergencyContactNumber").toString(), value, patientObj.get("displayName").toString(), patientObj.get("emergencyContactName").toString());
+		  
+		  // Make Call and send Message to the Emergency Contact
+		  callTwilio(emergencyContact, value, patientName, emergencyName);		  
+		  
+		  System.out.println("Made Emergency Call for Sensor ID: " + sensorID);
+		  sensorMap.put(sensorID, false);
 		}
 	}
 	
 	private static boolean criticalEstimate(int heartRate) {
-		int difference = heartRate - centerValue;
+		int difference = heartRate - medValue;
 		if(Math.abs(difference) >= delta){
-			System.out.println("Critical HeartRate");
+			weightMap.put(heartRate, 1);
+		}
+		
+		if(weightMap.containsKey(heartRate)){
+			if(((weightMap.get(heartRate) > 1) && (heartRate >= lastValue) && getSeries(heartRate)) || (Math.abs(centerValue - medValue) > 10)){
+				System.out.println("Critical HeartRate: " + heartRate);
+				return true;
+			}
+			int val = weightMap.get(heartRate) + 1;
+			weightMap.put(heartRate, val);
+		}
+		
+		centerValue = (centerValue + heartRate)/2 ;
+		System.out.println("Current Weight Map: " + weightMap);
+		System.out.println("No Critical HeartRate! Current Centroid: " + centerValue + "Current Heart Rate: " + heartRate);
+		lastValue = heartRate;
+		return false;
+	}
+	
+	private static boolean getSeries(int heartRate){
+		int count = 0;
+		Set<Integer> keys = weightMap.keySet();
+		for(int k : keys){
+            if((heartRate - k) > 1){
+            	count++;
+            }
+        }
+
+		if(count > 2){
 			return true;
 		}
-		else{
-			centerValue = (centerValue + heartRate)/2 ;
-		}
-		System.out.println("No Critical HeartRate" + centerValue);
 		return false;
 	}
 	
 	public static void callTwilio(String contactNumber, String record, String patientName, String contactName){
-		try {
+		try {		
 			TwilioCall twilioCall = new TwilioCall();
 	        try {
 				twilioCall.callTwilio(contactNumber, patientName, record, contactName);

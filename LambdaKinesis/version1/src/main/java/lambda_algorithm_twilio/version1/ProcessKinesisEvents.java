@@ -10,6 +10,7 @@ public class ProcessKinesisEvents {
         for(KinesisEventRecord rec : event.getRecords()) {
 //            JSONObject obj = new JSONObject(rec.getKinesis().getData().array());
             try{
+            	System.out.println("Value Received: " + new String(rec.getKinesis().getData().array()));
             	TriggerWebNotification.process(new String(rec.getKinesis().getData().array()), new String(rec.getKinesis().getPartitionKey().toString()));
             	
             }catch(Exception e){
