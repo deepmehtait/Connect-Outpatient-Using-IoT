@@ -83,7 +83,7 @@ angular.module('core').controller('HomeController', ['$scope', '$http', 'Socket'
         };
 
         //Appointments
-       /* $scope.calendarView = 'month';
+        $scope.calendarView = 'month';
         $scope.calendarDate = new Date();
         $scope.events = [
             {
@@ -109,6 +109,6 @@ angular.module('core').controller('HomeController', ['$scope', '$http', 'Socket'
                 draggable: true,
                 resizable: true
             }
-        ];*/
+        ];
     }
 ]);
