@@ -1,3 +1,42 @@
-<section>
-  This is the Doctor dashboard
+
+<section ng-controller="DoctorDashboardController">
+  <div class="row">
+    <div class="col-md-6">
+      <h3>Patients List</h3>
+      <div style="width: 1000px;height: auto;">
+
+
+        <div class="panel panel-default">
+        
+          <table class="table">
+            <thead>
+            <tr>
+         	   <th>Image</th>
+              <th>Name</th>
+              <th>UserName</th>
+           	  <th></th>
+            </tr>
+            </thead>
+            <tbody>
+            
+            <tr ng-repeat="cl in clientList" class="clickable">
+      
+              <td><img src="{{cl.profileImageURL}}"></td>
+              <td>{{cl.displayName}}</td>
+              <td>{{cl.username}}</td>
+       		  <td><a ui-sref="patient({patientId: cl.username})">Details</a></td>
+ 
+            </tr>
+            	
+            </tbody>
+          </table>
+        </div>
+      </div>
+		</div>
+    </div>
+
+    </div>
+
+
+  </div>
 </section>
