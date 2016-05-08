@@ -25,6 +25,9 @@ exports.addMedication = function (req, res) {
             if(socketio.sockets.connected[newMedication.patientId]) {
                 socketio.sockets.connected[newMedication.patientId].emit('medication.created', newMedication);
             }
+            if(socketio.sockets.connected[newMedication.medications.doctorId]){
+                socketio.sockets.connected[newMedication.medications.doctorId].emit('medication.created', newMedication);
+            }
             res.json({ 'Result': 'Medication added successfully' });
         }
      });

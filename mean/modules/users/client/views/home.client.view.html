@@ -1,7 +1,7 @@
 <section ng-controller="HomeController">
   <div class="row">
     <div class="col-md-6">
-      <h3>Current Status</h3>
+      <h3>{{patientHomeTitle}}</h3>
       <div style="width: 500px;height: 750px;">
       <canvas height="350" width="450"  id="line" class="chart chart-line" chart-data="data"
               chart-labels="labels" chart-legend="true" chart-series="series" chart-options="chartOptions"
@@ -9,7 +9,7 @@
       </canvas>
         <div class="panel panel-default">
           <div class="panel-heading">Medication Schedule
-            <a class="pull-right" ui-sref="admin.user-edit({userId: user._id})" ng-show="isDoctor">
+            <a class="pull-right"  ng-click="addMedication();" ng-if="isDoctor">
               <i class="glyphicon glyphicon-plus"></i>
             </a>
           </div>
@@ -27,12 +27,12 @@
               <td>{{cm.day}}</td>
               <td>{{cm.time}}</td>
               <td>
-                <a class="" ui-sref="medication-edit({userId: user._id})" ng-show="isDoctor">
+                <a class="" ng-click="editMedication(cm);" ng-if="isDoctor">
                   <i class="glyphicon glyphicon-edit"></i>
                 </a>
               </td>
               <td>
-                <a class="" ng-click="remove();" ng-show="isDoctor">
+                <a class="" ng-click="deleteMedication(cm);" ng-if="isDoctor">
                   <i class="glyphicon glyphicon-trash"></i>
                 </a>
               </td>

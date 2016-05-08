@@ -1,25 +1,29 @@
 'use strict';
 
-angular.module('core').controller('HomeController', ['$scope', '$stateParams', '$http', 'Socket', 'Authentication',
-    function ($scope, $stateParams, $http, Socket, Authentication) {
+angular.module('core').controller('HomeController', ['$scope', '$stateParams','$uibModal', '$http', 'Socket', 'Authentication',
+    function ($scope, $stateParams, $uibModal,$http, Socket, Authentication) {
         // This provides Authentication context
         $scope.authentication = Authentication;
         $scope.isDoctor = false;
         $scope.patientId = Authentication.user.username;
+        $scope.patientHomeTitle = Authentication.user.firstName + "'s Status"
 
-        if($stateParams && $stateParams.patientId){
-            $scope.patientId = $stateParams.patientId;
-        }
-
+        console.log($stateParams.patientDetail);
         //Set vars if coming from doctor dashboard
         var showListFilter = "";
         if (Authentication.user.roles.indexOf('doctor') > -1) {
             $scope.isDoctor = true;
             showListFilter = Authentication.user.username;
-            if($stateParams && $stateParams.patientId){
-                $scope.patientId = $stateParams.patientId;
+            if($stateParams && $stateParams.patientDetail){
+                $scope.patientId = $stateParams.patientDetail.username;
+                $scope.patientHomeTitle = $stateParams.patientDetail.displayName + "'s Status";
+            }
+            else{
+                $scope.patientHomeTitle = "Current Status";
             }
         }
+
+        //Medication ***********************************************************
 
         $http.get('/medication/' + $scope.patientId).success(function (response) {
             $scope.clientMedications = [];
@@ -40,6 +44,98 @@ angular.module('core').controller('HomeController', ['$scope', '$stateParams', '
         }).error(function (response) {
             $scope.error = response.message;
         });
+
+
+        //Open Medication Modal
+        $scope.addMedication = function (){
+            $scope.medicationModalTitle = "Add Medication";
+            $scope.modalInstance = $uibModal.open({
+                templateUrl: 'modules/users/client/views/medication.client.view.html',
+                controller: 'HomeController',
+                scope:$scope
+            });
+
+            $scope.modalInstance.result.then(function (data) {
+                var payload = {
+                    "patientId": $scope.patientId,
+                    "medications": {
+                        "name": data.medicationName,
+                        "dosage": data.medicationDosage,
+                        "doctorId": Authentication.user.username,
+                        "company": data.medicationCompany,
+                        "day": data.medicationDay,
+                        "time": data.medicationTime
+                    }
+                }
+                $http.post('/medication',payload).success(function (response) {
+                }).error(function (response) {
+                    $scope.error = response.message;
+                });
+            }, function () {
+
+            });
+        }
+
+
+        $scope.editMedication = function (medicationInfo){
+            $scope.medicationModalTitle = "Edit Medication";
+            //Set Existing Values
+            var oldMedicationName = medicationInfo.name;
+            $scope.medicationName = medicationInfo.name;
+            $scope.medicationTime = medicationInfo.time;
+            $scope.medicationDosage =  medicationInfo.dosage;
+            $scope.medicationCompany =  medicationInfo.company;
+            $scope.medicationDay =  medicationInfo.day;
+
+            $scope.modalInstance = $uibModal.open({
+                templateUrl: 'modules/users/client/views/medication.client.view.html',
+                controller: 'HomeController',
+                scope:$scope
+            });
+
+            $scope.modalInstance.result.then(function (data) {
+                var payload = {
+                    "patientId": $scope.patientId,
+                    "medications": {
+                        "name": data.medicationName,
+                        "dosage": data.medicationDosage,
+                        "doctorId": Authentication.user.username,
+                        "company": data.medicationCompany,
+                        "day": data.medicationDay,
+                        "time": data.medicationTime
+                    }
+                }
+                $http.post('/medication/' + $scope.patientId + '/' + oldMedicationName,payload).success(function (response) {
+                }).error(function (response) {
+                    $scope.error = response.message;
+                });
+            }, function () {
+
+            });
+        }
+
+        $scope.saveMedication = function () {
+            $scope.modalInstance.close({
+                "medicationName" : $scope.medicationName,
+                "medicationDosage" : $scope.medicationDosage,
+                "medicationCompany" : $scope.medicationCompany,
+                "medicationDay" : $scope.medicationDay,
+                "medicationTime" : $scope.medicationTime
+            });
+        }
+
+        $scope.closeMedication = function () {
+            $scope.modalInstance.dismiss('cancel');
+        }
+
+        $scope.deleteMedication = function(medicationInfo){
+            console.log(medicationInfo);
+            $http.delete('/medication/' + $scope.patientId + '/' + medicationInfo.name).success(function (response) {
+
+            }).error(function (response) {
+                $scope.error = response.message;
+            });
+        }
 
         //Handle socket events*************************
         Socket.on('medication.created', function (data) {

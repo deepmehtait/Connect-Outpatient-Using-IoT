@@ -11,7 +11,7 @@ angular.module('users').config(['$stateProvider',
       })
       .state('patient', {
           url: '/patient',
-          params : { patientId : null },
+          params : { patientDetail : null },
           templateUrl: 'modules/users/client/views/home.client.view.html'
       })
       .state('settings', {
