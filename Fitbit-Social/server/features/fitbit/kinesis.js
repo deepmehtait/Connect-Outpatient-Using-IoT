@@ -20,8 +20,8 @@
 
 
 
-            update: function update(fitbitData, heartRateToday, sensorid, value2) {
-                console.log("it comes here");
+            update: function update(fitbitData, heartRateToday, sensorid, value2, avg) {
+                console.log("it comes here inside kinesis.js update");
                 var date = new Date();
                 var sensoridd = sensorid;
                 var vString = value2.toString();
@@ -54,7 +54,10 @@
 
                 // uncomment after this if putting on kinesis
                 //  var number ="72";
-                console.log(vString);
+                console.log("timestamp " + date);
+                console.log("sensorid " + sensorid);
+                console.log("value2 = "+vString);
+                console.log("average value of heart rate " +  avg)
                 var params = {
                     Data: vString,
                     PartitionKey: sensoridd,
@@ -67,11 +70,11 @@
                     if (err) {console.log(err + " " + err.stack); } // an error occurred
                     else     {
 
-                        //console.log("-----   "+JSON.stringify(data)); 
-                        // console.log(heartRateToday);
+                        
                         request.post('http://52.8.186.40/fitbitdata',{ json: {  
                                         "username" : user,
                                         "fitbitUsername" : sensorid,
+                                        "average": avg,
                                         "healthdata" : {
                                             "timestamp" : date,
                                             "value" : vString

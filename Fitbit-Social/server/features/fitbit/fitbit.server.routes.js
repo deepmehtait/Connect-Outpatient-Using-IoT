@@ -25,6 +25,7 @@ var previousMinute;
 var sensorid;
 var BASE_OPTIONS;
 var REFRESH_OPTIONS;
+var avg;
 var count = 0;
 
 module.exports = function(app, passport) {
@@ -114,19 +115,13 @@ module.exports = function(app, passport) {
 
 
         var heartStreamingData = _.cloneDeep(BASE_OPTIONS);
-        // heartStreamingData.url       =  FITBIT_BASE_URL + '/activities/heart/date/today/1d/1sec/time/00:20/00:30.json';
 
-        // heartStreamingData.url       =  FITBIT_BASE_URL + '/activities/heart/date/2016-02-23/today/1min.json';
 
         heartStreamingData.url = FITBIT_BASE_URL + '/activities/heart/date/today/1m.json';
 
         //GET https://api.fitbit.com/1/user/-/activities/heart/date/[date]/[end-date]/[detail-level]/time/[start-time]/[end-time].json
 
-        // var stepsOptions             = _.cloneDeep(BASE_OPTIONS);
-        // stepsOptions.url             = FITBIT_BASE_URL + '/activities/steps/date/today/7d.json';
-
-        // var veryActiveMinutesOptions = _.cloneDeep(BASE_OPTIONS);
-        // veryActiveMinutesOptions.url = FITBIT_BASE_URL + '/activities/minutesVeryActive/date/today/7d.json';
+   
 
         var activitiesOptions = _.cloneDeep(BASE_OPTIONS);
         activitiesOptions.url = FITBIT_BASE_URL + '/activities.json';
@@ -205,7 +200,7 @@ module.exports = function(app, passport) {
                 });
 
 
-                var pushData = schedule.scheduleJob('* * * * *', function() {
+                var pushData = schedule.scheduleJob('*/10 * * * * *', function() {
                     sensorid = userCredentials.userId;
                     // console.log(userCredentials.refreshToken);
                     // console.log(BASE_OPTIONS);
@@ -265,6 +260,7 @@ module.exports = function(app, passport) {
 
 
                     if (fitbitCronData !== undefined) {
+
                         var date = new Date();
 
                         var array =  JSON.stringify(fitbitCronData.heartRateCronToday2);
@@ -274,6 +270,7 @@ module.exports = function(app, passport) {
 
                         fitbitCronData.heartRateCronToday2 = str;
 
+                        // console.log(str);
                         var value = JSON.parse(fitbitCronData.heartRateCronToday2);
 
 
@@ -287,16 +284,15 @@ module.exports = function(app, passport) {
 
 
                                         var value3 = value.activitiesHeartIntraday.dataset[value.activitiesHeartIntraday.dataset.length - 1].time;
-                                        console.log("value2 " + value2);
+
                                         var result = value3.split(':');
 
-
-                                        kinesis.update(fitbitData, fitbitData.heartRateToday, sensorid, value2);
-
-
-
+                                        avg = value.activitiesOfHeart[0].value;
+                                    
+                                        kinesis.update(fitbitData, fitbitData.heartRateToday, sensorid, value2, avg);
 
                                         previousHour = result[0];
+                                        
                                         previousMinute = result[1];
 
                                     }
