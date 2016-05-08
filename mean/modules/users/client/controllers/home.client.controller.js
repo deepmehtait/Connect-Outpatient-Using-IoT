@@ -4,24 +4,34 @@ angular.module('core').controller('HomeController', ['$scope', '$http', 'Socket'
     function ($scope, $http, Socket, Authentication) {
         // This provides Authentication context.
         $scope.authentication = Authentication;
-
-        /*$scope.labels = [0];
-         $scope.data = [0];
-         for(var i=1 ; i< 25; i++){
-         $scope.labels.push(i);
-         $scope.data.push(70+(i*2));
-         }*/
+        $scope.isDoctor = false;
+        var showListFilter = "";
+        if (Authentication.user.roles.indexOf('doctor') > -1) {
+            $scope.isDoctor = true;
+            showListFilter = Authentication.user.username;
+        }
 
         $http.get('/medication/' + Authentication.user.username).success(function (response) {
             $scope.clientMedications = [];
             if (response instanceof Array) {
+                /*if(showListFilter){
+                 var tempMedication = [];
+                 for(var i=0; i< response.length ; i++){
+                 if(response[i].doctorId == showListFilter){
+                 tempMedication.push(response[i]);
+                 }
+                 }
+                 $scope.clientMedications = tempMedication;
+                 }
+                 else{*/
                 $scope.clientMedications = response;
+                //}
             }
         }).error(function (response) {
             $scope.error = response.message;
         });
 
-        //Handle socket events
+        //Handle socket events*************************
         Socket.on('medication.created', function (data) {
             $scope.clientMedications.push({
                 "name": data.medications.name,
@@ -41,7 +51,7 @@ angular.module('core').controller('HomeController', ['$scope', '$http', 'Socket'
             });
         });
 
-        //Live Heart Rate data
+        //Live Heart Rate data***********************
         $scope.series = ['Heart Rate'];
         var tempList = [];
         $scope.labels = [];
@@ -55,7 +65,7 @@ angular.module('core').controller('HomeController', ['$scope', '$http', 'Socket'
         };
 
         $http.get('/fitbitdata/' + Authentication.user.username).success(function (response) {
-            if(response && response.healthdata) {
+            if (response && response.healthdata) {
                 for (var i = 0; i < response.healthdata.length; i++) {
                     var tempTimestamp = [];
                     var finalTimestamp = "";
@@ -78,7 +88,7 @@ angular.module('core').controller('HomeController', ['$scope', '$http', 'Socket'
             $scope.chartOptions.animation = false;
             var tempTimestamp = [];
             var finalTimestamp = "";
-            if(data.timestamp) {
+            if (data.timestamp) {
                 tempTimestamp = data.timestamp.split("T")[1];
                 if (tempTimestamp) {
                     var res1 = tempTimestamp.split(":");
@@ -100,33 +110,43 @@ angular.module('core').controller('HomeController', ['$scope', '$http', 'Socket'
             console.log(points, evt);
         };
 
-        //Appointments
+        //Appointments***********************************
         $scope.calendarView = 'month';
         $scope.calendarDate = new Date();
-        $scope.events = [
-            {
-                title: 'An event',
-                type: 'warning',
-                startsAt: moment().startOf('week').subtract(2, 'days').add(8, 'hours').toDate(),
-                endsAt: moment().startOf('week').add(1, 'week').add(9, 'hours').toDate(),
-                draggable: true,
-                resizable: true
-            }, {
-                title: '<i class="glyphicon glyphicon-asterisk"></i> <span class="text-primary">Another event</span>, with a <i>html</i> title',
-                type: 'info',
-                startsAt: moment().subtract(1, 'day').toDate(),
-                endsAt: moment().add(5, 'days').toDate(),
-                draggable: true,
-                resizable: true
-            }, {
-                title: 'This is a really long event title that occurs on every year',
-                type: 'important',
-                startsAt: moment().startOf('day').add(7, 'hours').toDate(),
-                endsAt: moment().startOf('day').add(19, 'hours').toDate(),
-                recursOn: 'year',
-                draggable: true,
-                resizable: true
+        $scope.events = [];
+
+        $http.get('/appointment/' + Authentication.user.username).success(function (response) {
+            if (response && response.data) {
+                for (var i = 0; i < response.data.length; i++) {
+                    var newEvent = {type: 'info', draggable: false, resizable: false};
+                    newEvent.startsAt = moment(response.data[i].date);
+                    newEvent.endsAt = moment(response.data[i].date);
+                    newEvent.title = '<img class="header-profile-image" alt="' + response.data[i].doctorName + '" ' +
+                        'ng-src="' + response.data[i].doctorProfileImageURL + '" ' +
+                        'src="' + response.data[i].doctorProfileImageURL + '"> ' +
+                        '<span class="text-primary">' + response.data[i].doctorName + '</span>';
+                    if (showListFilter && showListFilter == response.data[i].doctorId) {
+                        $scope.events.push(newEvent);
+                    }
+                    else {
+                        $scope.events.push(newEvent);
+                    }
+                }
             }
-        ];
+        }).error(function (response) {
+            $scope.error = response.message;
+        });
+
+
+        /*$scope.events = [
+         {
+         title: '<i class="glyphicon glyphicon-asterisk"></i> <span class="text-primary">Another event</span>, with a <i>html</i> title',
+         type: 'info',
+         startsAt: moment().subtract(1, 'day').toDate(),
+         endsAt: moment().add(5, 'days').toDate(),
+         draggable: true,
+         resizable: false
+         }
+         ];*/
     }
 ]);
