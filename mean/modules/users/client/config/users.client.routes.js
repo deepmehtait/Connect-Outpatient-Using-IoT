@@ -9,6 +9,11 @@ angular.module('users').config(['$stateProvider',
         url: '/doctor-dashboard',
         templateUrl: 'modules/users/client/views/doctor-dashboard.client.view.html'
       })
+      .state('patient', {
+          url: '/patient',
+          params : { patientId : null },
+          templateUrl: 'modules/users/client/views/home.client.view.html'
+      })
       .state('settings', {
         abstract: true,
         url: '/settings',

@@ -17,7 +17,15 @@ angular.module('core').controller('HeaderController', ['$scope', '$state', 'Auth
 
     $scope.checkAuthenticatedUser = function(user){
       var newState = "landing";
-      if(user)newState = "home";
+      if($scope.authentication.user.roles.indexOf('admin') > -1){
+        newState = 'admin.users';
+      }
+      else if($scope.authentication.user.roles.indexOf('doctor') > -1){
+        newState  = 'doctor-dashboard';
+      }
+      else{
+        newState = 'home';
+      }
       return $state.href(newState);
     };
     // Collapsing the menu after navigation

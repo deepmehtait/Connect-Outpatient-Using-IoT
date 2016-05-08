@@ -1,17 +1,27 @@
 'use strict';
 
-angular.module('core').controller('HomeController', ['$scope', '$http', 'Socket', 'Authentication',
-    function ($scope, $http, Socket, Authentication) {
-        // This provides Authentication context.
+angular.module('core').controller('HomeController', ['$scope', '$stateParams', '$http', 'Socket', 'Authentication',
+    function ($scope, $stateParams, $http, Socket, Authentication) {
+        // This provides Authentication context
         $scope.authentication = Authentication;
         $scope.isDoctor = false;
+        $scope.patientId = Authentication.user.username;
+
+        if($stateParams && $stateParams.patientId){
+            $scope.patientId = $stateParams.patientId;
+        }
+
+        //Set vars if coming from doctor dashboard
         var showListFilter = "";
         if (Authentication.user.roles.indexOf('doctor') > -1) {
             $scope.isDoctor = true;
             showListFilter = Authentication.user.username;
+            if($stateParams && $stateParams.patientId){
+                $scope.patientId = $stateParams.patientId;
+            }
         }
 
-        $http.get('/medication/' + Authentication.user.username).success(function (response) {
+        $http.get('/medication/' + $scope.patientId).success(function (response) {
             $scope.clientMedications = [];
             if (response instanceof Array) {
                 /*if(showListFilter){
@@ -64,7 +74,7 @@ angular.module('core').controller('HomeController', ['$scope', '$http', 'Socket'
             scaleStartValue: 35
         };
 
-        $http.get('/fitbitdata/' + Authentication.user.username).success(function (response) {
+        $http.get('/fitbitdata/' + $scope.patientId).success(function (response) {
             if (response && response.healthdata) {
                 for (var i = 0; i < response.healthdata.length; i++) {
                     var tempTimestamp = [];
@@ -97,7 +107,6 @@ angular.module('core').controller('HomeController', ['$scope', '$http', 'Socket'
             }
             $scope.labels.push(finalTimestamp);
             tempList.push(data.value);
-            console.log($scope.data);
             if ($scope.labels.length > 10) {
                 $scope.labels.shift();
             }
@@ -115,7 +124,7 @@ angular.module('core').controller('HomeController', ['$scope', '$http', 'Socket'
         $scope.calendarDate = new Date();
         $scope.events = [];
 
-        $http.get('/appointment/' + Authentication.user.username).success(function (response) {
+        $http.get('/appointment/' + $scope.patientId).success(function (response) {
             if (response && response.data) {
                 for (var i = 0; i < response.data.length; i++) {
                     var newEvent = {type: 'info', draggable: false, resizable: false};
@@ -125,10 +134,7 @@ angular.module('core').controller('HomeController', ['$scope', '$http', 'Socket'
                         'ng-src="' + response.data[i].doctorProfileImageURL + '" ' +
                         'src="' + response.data[i].doctorProfileImageURL + '"> ' +
                         '<span class="text-primary">' + response.data[i].doctorName + '</span>';
-                    if (showListFilter && showListFilter == response.data[i].doctorId) {
-                        $scope.events.push(newEvent);
-                    }
-                    else {
+                    if (!showListFilter || (showListFilter && showListFilter == response.data[i].doctorId)) {
                         $scope.events.push(newEvent);
                     }
                 }
