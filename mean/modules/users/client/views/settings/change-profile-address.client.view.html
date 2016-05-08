@@ -1,0 +1,37 @@
+<section class="row" ng-controller="EditProfileController">
+  <div class="col-xs-offset-1 col-xs-10 col-md-offset-4 col-md-4">
+    <form name="addressForm" ng-submit="updateUserAddress(addressForm.$valid)" class="signin" novalidate autocomplete="off">
+      <fieldset>
+        <div class="form-group" show-errors>
+          <label for="hospitalName">Hospital Name</label>
+          <input type="text" id="hospitalName" name="hospitalName" class="form-control" ng-model="user.hospitalName" placeholder="hospitalName">
+        </div>
+        <div class="form-group" show-errors>
+          <label for="address">Address</label>
+          <input type="text" id="address" name="address" class="form-control" ng-model="user.address" placeholder="address">
+        </div>
+        <div class="form-group" show-errors>
+          <label for="city">City</label>
+          <input type="text" id="city" name="city" class="form-control" ng-model="user.city" placeholder="city">
+        </div>
+        <div class="form-group" show-errors>
+          <label for="state">State</label>
+          <input type="text" id="state" name="state" class="form-control" ng-model="user.state" placeholder="state">
+        </div>
+        <div class="form-group" show-errors>
+          <label for="zipcode">Zipcode</label>
+          <input type="text" id="zipcode" name="zipcode" class="form-control" ng-model="user.zipcode" placeholder="zipcode">
+        </div>
+        <div class="text-center form-group">
+          <button type="submit" class="btn btn-primary">Save</button>
+        </div>
+        <div ng-show="success" class="text-center text-success">
+          <strong>Profile Saved Successfully</strong>
+        </div>
+        <div ng-show="error" class="text-center text-danger">
+          <strong ng-bind="error"></strong>
+        </div>
+      </fieldset>
+    </form>
+  </div>
+</section>

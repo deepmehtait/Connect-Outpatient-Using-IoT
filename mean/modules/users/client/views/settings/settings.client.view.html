@@ -9,12 +9,18 @@
           <a ui-sref="settings.profile">Edit Profile</a>
         </li>
         <li ui-sref-active="active">
+          <a ui-sref="settings.address">Address Information</a>
+        </li>
+        <li ui-sref-active="active">
+          <a ui-sref="settings.emergency">Emergency Contact</a>
+        </li>
+        <li ui-sref-active="active">
           <a ui-sref="settings.picture">Change Profile Picture</a>
         </li>
         <li ui-sref-active="active" ng-show="user.provider === 'local'">
           <a ui-sref="settings.password">Change Password</a>
         </li>
-      </ul>
+       </ul>
     </nav>
     <div class="col-sm-9 col-md-8 settings-view">
       <div ui-view></div>
