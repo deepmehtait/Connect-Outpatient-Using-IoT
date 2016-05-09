@@ -20,6 +20,19 @@ var FitbitdataSchema = new Schema({
     type: String,
     trim: true
   },
+
+  avgValue: {
+    type: String
+  },
+
+  maxValue : {
+    type: String
+  },
+
+  minValue : {
+    type: String
+  },
+
   'healthdata':{}
 
 });
