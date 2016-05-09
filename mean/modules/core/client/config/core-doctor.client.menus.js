@@ -2,18 +2,16 @@
 
 angular.module('core').run(['Menus',
   function (Menus) {
-    /*Menus.addMenuItem('topbar', {
-      title: 'Medication',
-      state: 'doctorMedication',
-      type: 'dropdown',
+    Menus.addMenuItem('topbar', {
+      title: 'Home',
+      state: 'doctor-dashboard',
       roles: ['doctor']
     });
 
     Menus.addMenuItem('topbar', {
-      title: 'Appointment',
-      state: 'doctorAppointment',
-      type: 'dropdown',
-      roles: ['doctor']
-    });*/
+      title: 'Home',
+      state: 'home',
+      roles: ['patient']
+    });
   }
 ]);

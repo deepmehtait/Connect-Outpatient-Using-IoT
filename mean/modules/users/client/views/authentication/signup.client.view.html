@@ -46,6 +46,14 @@
           <label>Password Requirements</label>
           <progressbar value="requirementsProgress" type="{{requirementsColor}}"><span style="color:white; white-space:nowrap;">{{requirementsProgress}}%</span></progressbar>
         </div>
+        <div class="form-group">
+        <label class="radio-inline">
+          <input type="radio" name="userRoleOptions" id="rolePatient" value="patient"> Patient
+        </label>
+        <label class="radio-inline">
+          <input type="radio" name="userRoleOptions" id="roleDoctor" value="doctor"> Doctor
+        </label>
+        </div>
         <div class="text-center form-group">
           <button type="submit" class="btn btn-primary">Sign up</button>
           &nbsp; or&nbsp;

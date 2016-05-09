@@ -6,7 +6,8 @@ angular.module('core').controller('HomeController', ['$scope', '$stateParams','$
         $scope.authentication = Authentication;
         $scope.isDoctor = false;
         $scope.patientId = Authentication.user.username;
-        $scope.patientHomeTitle = Authentication.user.firstName + "'s Status"
+        $scope.patientHomeTitle = Authentication.user.firstName + "'s Status";
+        $scope.patientName = Authentication.user.displayName;
 
         console.log($stateParams.patientDetail);
         //Set vars if coming from doctor dashboard
@@ -17,6 +18,7 @@ angular.module('core').controller('HomeController', ['$scope', '$stateParams','$
             if($stateParams && $stateParams.patientDetail){
                 $scope.patientId = $stateParams.patientDetail.username;
                 $scope.patientHomeTitle = $stateParams.patientDetail.displayName + "'s Status";
+                $scope.patientName = $stateParams.patientDetail.displayName;
             }
             else{
                 $scope.patientHomeTitle = "Current Status";
@@ -136,6 +138,81 @@ angular.module('core').controller('HomeController', ['$scope', '$stateParams','$
                 $scope.error = response.message;
             });
         }
+
+
+
+        //Open Appointment Modal***********************************************
+
+        //Time Picker Options
+        $scope.appointmentTime = new Date();
+        $scope.hstep = 1;
+        $scope.mstep = 5;
+        $scope.ismeridian = true;
+
+        //Date Picker options
+        $scope.appointmentDate = new Date();
+        $scope.dateOptions = {
+            startingDay: 1,
+            initDate: new Date()
+        };
+        $scope.open1 = function() {
+            $scope.popup1.opened = true;
+        };
+        $scope.formats = ['dd-MMMM-yyyy', 'yyyy/MM/dd', 'dd.MM.yyyy','dd-MMMM-yyyy', 'shortDate'];
+        $scope.format = $scope.formats[0];
+        //$scope.altInputFormats = ['M!/d!/yyyy'];
+        $scope.popup1 = {
+            opened: false
+        };
+
+        $scope.addAppointment = function (){
+            $scope.appointmentDate = new Date();
+            $scope.appointmentDate.setDate($scope.appointmentDate.getDate()-7);
+            $scope.appointmentModalTitle = "Add Appointment";
+            $scope.appointmentModalInstance = $uibModal.open({
+                templateUrl: 'modules/users/client/views/appointment.client.view.html',
+                controller: 'HomeController',
+                scope:$scope
+            });
+
+            $scope.appointmentModalInstance.result.then(function (data) {
+                var payload = {
+                    "patientId": $scope.patientId,
+                    "medications": {
+                        "name": data.medicationName,
+                        "dosage": data.medicationDosage,
+                        "doctorId": Authentication.user.username,
+                        "company": data.medicationCompany,
+                        "day": data.medicationDay,
+                        "time": data.medicationTime
+                    }
+                }
+                $http.post('/medication',payload).success(function (response) {
+                }).error(function (response) {
+                    $scope.error = response.message;
+                });
+            }, function () {
+
+            });
+        }
+
+
+        $scope.saveAppointmentForm = function () {
+            $scope.appointmentModalInstance.close({
+
+
+
+            });
+        }
+
+        $scope.closeAppointmentForm = function () {
+            $scope.appointmentModalInstance.dismiss('cancel');
+        }
+
+
+
+
+
 
         //Handle socket events*************************
         Socket.on('medication.created', function (data) {

@@ -8,14 +8,14 @@
             <div class="form-group" show-errors>
               <label for="medicationName">Medication Name</label>
               <input type="text" id="medicationName" name="medicationName" class="form-control" ng-model="medicationName" placeholder="" required>
-              <div ng-show="medicationForm.medicationName.$invalid" role="alert">
+              <div ng-show="medicationForm.medicationName.$dirty && medicationForm.medicationName.$invalid" role="alert">
                 <span style="color:red">Medication name is required.</span>
               </div>
             </div>
             <div class="form-group" show-errors>
               <label for="medicationDosage">Medication Dosage</label>
               <input type="text" id="medicationDosage" name="medicationDosage" class="form-control" ng-model="medicationDosage" placeholder="" required>
-              <div ng-show="medicationForm.medicationDosage.$invalid">
+              <div ng-show="medicationForm.medicationDosage.$dirty && medicationForm.medicationDosage.$invalid">
                 <span  style="color:red">Dosage is required.</span>
               </div>
             </div>
@@ -26,14 +26,14 @@
             <div class="form-group" show-errors>
               <label  for="medicationDay">Day</label>
               <input type="text" id="medicationDay" name="medicationDay" class="form-control" ng-model="medicationDay" placeholder="" required>
-              <div ng-show="medicationForm.medicationDay.$invalid">
+              <div ng-show="medicationForm.medicationDay.$dirty && medicationForm.medicationDay.$invalid">
                 <span  style="color:red">Day is required.</span>
               </div>
             </div>
             <div class="form-group" show-errors>
               <label  for="medicationTime">Time</label>
               <input type="text" id="medicationTime" name="medicationTime" class="form-control" ng-model="medicationTime" placeholder="" required>
-              <div ng-show="medicationForm.medicationTime.$invalid">
+              <div ng-show="medicationForm.medicationTime.$dirty && medicationForm.medicationTime.$invalid">
                 <span style="color:red">Time is required</span>
               </div>
             </div>
