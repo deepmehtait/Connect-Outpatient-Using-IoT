@@ -67,21 +67,16 @@ public class PatientMedication extends AppCompatActivity {
         rows.add("My Medications");
         rows.add("Appointment");
         rows.add("Log Out");
-        String email=sharedpreferences.getString("email","");
+        final String email=sharedpreferences.getString("email","");
+        final String userName=sharedpreferences.getString("username","");
         String pic=sharedpreferences.getString("profilepic","http://www.sourcecoi.com/sites/default/files/team/defaultpic_0.png");
         DrawerAdapterPatient drawerAdapter = new DrawerAdapterPatient(getApplicationContext(),rows,email,pic);
         recyclerView.setAdapter(drawerAdapter);
         recyclerView.setHasFixedSize(true);
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
-
-
-
         dayMedication=(ListView)findViewById(R.id.DaysListView);
         if (AppStatus.getInstance(getApplicationContext()).isOnline()) {
-
-
-            String URL = AppBaseURL.BaseURL + "medication/newpatient";
-
+            String URL = AppBaseURL.BaseURL + "medication/"+userName;
             JsonArrayRequest jsonRequest = new JsonArrayRequest(Request.Method.GET, URL, (JSONObject) null, new Response.Listener<JSONArray>() {
 
                 @Override
@@ -127,10 +122,7 @@ public class PatientMedication extends AppCompatActivity {
             // If no network connectivity notify user
             Toast.makeText(getApplicationContext(), "Please Check Internet Connection", Toast.LENGTH_SHORT).show();
         }
-
-
     }
-
     // Handle back button event fired.
     @Override
     public void onBackPressed()

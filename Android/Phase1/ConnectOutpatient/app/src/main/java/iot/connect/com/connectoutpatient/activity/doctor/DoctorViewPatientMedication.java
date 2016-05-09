@@ -5,6 +5,7 @@ import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.widget.Adapter;
 import android.widget.ListAdapter;
@@ -36,6 +37,7 @@ public class DoctorViewPatientMedication extends AppCompatActivity {
     ListView dayMedication;
     ListAdapter adapter;
     SharedPreferences sharedpreferences;
+    Toolbar toolbar;
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -44,6 +46,8 @@ public class DoctorViewPatientMedication extends AppCompatActivity {
         final String pusername=i.getStringExtra("id");
         sharedpreferences = getSharedPreferences("ConnectIoT", getApplicationContext().MODE_PRIVATE);
         dayMedication=(ListView)findViewById(R.id.DaysListView);
+        toolbar = (Toolbar) findViewById(R.id.toolbar);
+        setSupportActionBar(toolbar);
         setTitle("Patient Medication");
         if (AppStatus.getInstance(getApplicationContext()).isOnline()) {
 
