@@ -2,34 +2,58 @@
 <section ng-controller="DoctorDashboardController">
   <div class="row">
     <div class="col-md-6">
-      <h3>Patients List</h3>
-      <div style="width: 1000px;height: auto;">
-        <div class="panel panel-default">
+        <div class="panel panel-default" style="margin-top: 40px;">
+          <div class="panel-heading">Patient List</div>
           <table class="table">
             <thead>
             <tr>
-         	   <th></th>
-              <th>Name</th>
-              <th>UserName</th>
+         	    <th></th>
+              <th>Patient Info</th>
+              <th>Emergency Contact</th>
            	  <th></th>
             </tr>
             </thead>
             <tbody>
             <tr ng-repeat="cl in clientList" class="clickable">
               <td><img class="header-profile-image" style="height: 75px; width: 75px" src="{{cl.profileImageURL}}"></td>
-              <td>{{cl.displayName}}</td>
-              <td>{{cl.username}}</td>
+              <td>{{cl.displayName}}
+                <p> {{cl.phoneNumber}}
+                <br> {{cl.email}}
+                <br> {{cl.address}}
+                <br> {{cl.city + " " + cl.state + " " + cl.zipcode}}</p>
+              </td>
+              <td>{{cl.emergencyContactName}}
+                <br> {{cl.emergencyContactNumber}}
+              </td>
        		  <td><a ui-sref="patient({patientDetail: cl})">Details</a></td>
            </tr>
             </tbody>
           </table>
-        </div>
       </div>
 		</div>
+    <div class="col-md-6" >
+      <div class="panel panel-default" style="margin-top: 40px;">
+        <div class="panel-heading">Upcoming Appointments
+          <a class="pull-right"  ng-click="addAppointment();">
+            <i class="glyphicon glyphicon-plus"></i>
+          </a>
+        </div>
+        <mwl-calendar
+          view="calendarView",
+          view-date="calendarDate"
+          events="events"
+          view-title="MyTitle"
+          edit-event-html="'<i class=glyphicon glyphicon-pencil></i>'"
+          delete-event-html="'<i class=glyphicon glyphicon-remove></i>'"
+          on-edit-event-click="eventEdited(calendarEvent)"
+          on-delete-event-click="eventDeleted(calendarEvent)"
+          on-event-click="eventClicked(calendarEvent)"
+          cell-is-open="false">
+        </mwl-calendar>
+
+      </div>
     </div>
-
     </div>
-
-
+    </div>
   </div>
 </section>

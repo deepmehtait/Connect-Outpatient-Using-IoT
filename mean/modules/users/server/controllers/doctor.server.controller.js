@@ -18,7 +18,7 @@ exports.getPatients = function (req, res) {
         message: errorHandler.getErrorMessage(err)
       });
     } else {
-      User.find({ 'username' : { $in: data.patients } }, 'username displayName profileImageURL', function (err2,data2) {
+      User.find({ 'username' : { $in: data.patients } }, function (err2,data2) {
         if (err2) {
           return res.status(400).send({
             message: errorHandler.getErrorMessage(err2)
