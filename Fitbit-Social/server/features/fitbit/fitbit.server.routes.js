@@ -9,8 +9,8 @@ var FITBIT_BASE_URL = 'https://api.fitbit.com/1/user/-';
 var schedule = require('node-schedule');
 var http = require('http');
 
-var clientID = "227KT9";
-var clientSecret = "8dc1ea69daacbe7b4af8ef3ae94cf7d5";
+var clientID = "";
+var clientSecret = "";
 var fitbitData;
 var fitbitCronData;
 var heartRateOptions;
