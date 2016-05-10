@@ -58,7 +58,8 @@
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
                                 android:text="63"
-                                android:textColor="@color/primary_text"
+                                android:id="@+id/minValue"
+                                android:textColor="#00ff00"
                                 android:textSize="60dp" />
 
                             <TextView
@@ -90,7 +91,8 @@
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
                                 android:text="77"
-                                android:textColor="@color/primary_text"
+                                android:id="@+id/averageValue"
+                                android:textColor="@color/primary"
                                 android:textSize="60dp" />
 
                             <TextView
@@ -123,7 +125,8 @@
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
                                 android:text="89"
-                                android:textColor="@color/primary_text"
+                                android:id="@+id/maxValue"
+                                android:textColor="#ff0000"
                                 android:textSize="60dp" />
 
                             <TextView

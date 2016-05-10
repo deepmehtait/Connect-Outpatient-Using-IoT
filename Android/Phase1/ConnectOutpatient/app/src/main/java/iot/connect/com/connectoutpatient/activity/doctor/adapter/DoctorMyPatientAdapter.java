@@ -73,7 +73,7 @@ public class DoctorMyPatientAdapter extends BaseAdapter {
         row.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Toast.makeText(context,"Name-"+mpld.get(position).getDisplayName(),Toast.LENGTH_SHORT).show();
+                //Toast.makeText(context,"Name-"+mpld.get(position).getDisplayName(),Toast.LENGTH_SHORT).show();
                 Intent i=new Intent(context, DoctorPatientDetail.class);
                 i.putExtra("patientName",mpld.get(position).getDisplayName());
                 i.putExtra("picURL",mpld.get(position).getProfileImageURL());

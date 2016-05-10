@@ -5,6 +5,7 @@ import android.graphics.Color;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.widget.DrawerLayout;
+import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
@@ -52,13 +53,16 @@ import iot.connect.com.connectoutpatient.utils.AppStatus;
 /**
  * Created by Deep on 19-Apr-16.
  */
-public class DoctorDashboardActivity extends AppCompatActivity {
+public class DoctorDashboardActivity extends AppCompatActivity implements SwipeRefreshLayout.OnRefreshListener {
     DrawerLayout drawerLayout;
     Toolbar toolbar;
     RecyclerView recyclerView;
     GraphView graph;
     SharedPreferences sharedpreferences;
     ListView appListview;
+    DoctorMyAppointment adapter;
+    SwipeRefreshLayout swipeRefreshLayout;
+    ArrayList<ViewAppoinment> appoinmentslist;
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -85,10 +89,21 @@ public class DoctorDashboardActivity extends AppCompatActivity {
         recyclerView.setAdapter(drawerAdapter);
         recyclerView.setHasFixedSize(true);
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
-
+        swipeRefreshLayout=(SwipeRefreshLayout)findViewById(R.id.swiperefresh);
         appListview=(ListView)findViewById(R.id.appointmentListView);
+        appoinmentslist=new ArrayList<ViewAppoinment>();
+        adapter=new DoctorMyAppointment(getApplicationContext(),appoinmentslist);
+        appListview.setAdapter(adapter);
+        swipeRefreshLayout.setOnRefreshListener(this);
+        swipeRefreshLayout.post(new Runnable() {
+            @Override
+            public void run() {
+                swipeRefreshLayout.setRefreshing(true);
+                getAppointmentList(userName);
+            }
+        });
         /// Get appointment for doctor
-        if (AppStatus.getInstance(getApplicationContext()).isOnline()) {
+        /*if (AppStatus.getInstance(getApplicationContext()).isOnline()) {
 
 
             String URL = AppBaseURL.BaseURL + "appointment/"+userName;
@@ -110,7 +125,12 @@ public class DoctorDashboardActivity extends AppCompatActivity {
                         }
 
                     }
-                    appListview.setAdapter(new DoctorMyAppointment(getApplicationContext(),viewAppoinments));
+                    if(viewAppoinments.isEmpty()){
+                        Toast.makeText(getApplicationContext(),"No Appointment for today",Toast.LENGTH_SHORT).show();
+                    }else{
+                        appListview.setAdapter(new DoctorMyAppointment(getApplicationContext(),viewAppoinments));
+                    }
+
 
 
 
@@ -129,8 +149,72 @@ public class DoctorDashboardActivity extends AppCompatActivity {
         } else {
             // If no network connectivity notify user
             Toast.makeText(getApplicationContext(), "Please Check Internet Connection", Toast.LENGTH_SHORT).show();
+        }*/
+
+
+    }
+
+
+    private void getAppointmentList(String userName){
+
+        /// Get appointment for doctor
+        if (AppStatus.getInstance(getApplicationContext()).isOnline()) {
+
+            swipeRefreshLayout.setRefreshing(true);
+            String URL = AppBaseURL.BaseURL + "appointment/"+userName;
+            JsonObjectRequest jsonRequest = new JsonObjectRequest(Request.Method.GET, URL, (JSONObject) null, new Response.Listener<JSONObject>() {
+
+                @Override
+                public void onResponse(JSONObject response) {
+                    // the response is already constructed as a JSONObject!
+                    Log.d("Response-", response.toString());
+                    Gson gs=new Gson();
+                    AppointmentParser appointmentParser=gs.fromJson(response.toString(),AppointmentParser.class);
+                    //adapter(getApplicationContext(),appointmentParser.getData());
+                    ArrayList<ViewAppoinment> viewAppoinments=new ArrayList<ViewAppoinment>();
+                    for(int i=0;i<appointmentParser.getData().size();i++){
+                        String[] date=appointmentParser.getData().get(i).getDate().split("T");
+                        Date date1=new Date();
+                        String modifiedDate= new SimpleDateFormat("yyyy-MM-dd").format(date1);
+                        if(modifiedDate.equals(date[0])){
+                            viewAppoinments.add(appointmentParser.getData().get(i));
+                        }
+
+                    }
+                    if(viewAppoinments.isEmpty()){
+                        Toast.makeText(getApplicationContext(),"No Appointment for today",Toast.LENGTH_SHORT).show();
+                        appoinmentslist.clear();
+                        adapter.notifyDataSetChanged();
+                    }else{
+                        appoinmentslist.clear();
+                        appoinmentslist.addAll(viewAppoinments);
+                        adapter.notifyDataSetChanged();
+                        //appListview.setAdapter(new DoctorMyAppointment(getApplicationContext(),viewAppoinments));
+                    }
+                    swipeRefreshLayout.setRefreshing(false);
+                }
+            }, new Response.ErrorListener() {
+                @Override
+                public void onErrorResponse(VolleyError error) {
+
+                    error.printStackTrace();
+                }
+            });
+            jsonRequest.setShouldCache(false);
+            Volley.newRequestQueue(getApplicationContext()).add(jsonRequest);
+        } else {
+            // If no network connectivity notify user
+            Toast.makeText(getApplicationContext(), "Please Check Internet Connection", Toast.LENGTH_SHORT).show();
         }
 
+    }
 
+    @Override
+    public void onRefresh() {
+        sharedpreferences = getSharedPreferences("ConnectIoT", getApplicationContext().MODE_PRIVATE);
+
+        final String userName=sharedpreferences.getString("username","");
+
+        getAppointmentList(userName);
     }
 }

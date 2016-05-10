@@ -87,8 +87,6 @@ public class DoctorPatientDetail extends AppCompatActivity {
                 Gson gs=new Gson();
                 HealthData healthData=gs.fromJson(jsonObject.toString(),HealthData.class);
                 if(healthData.getResult()==null){
-
-
                 min.setText(healthData.getMinValue());
                 max.setText(healthData.getMaxValue());
                 average.setText(healthData.getAvgValue());
@@ -97,10 +95,8 @@ public class DoctorPatientDetail extends AppCompatActivity {
                 for(int i=0;i<healthData.getHealthdata().size();i++){
                     Log.d("i-",""+i);
                     seriesHR.appendData(new DataPoint(getCount(),Double.parseDouble( healthData.getHealthdata().get(i).getValue())),true,50);
-
                 }
                 graph.addSeries(seriesHR);
-                //Toast.makeText(context,jsonObject.toString(),Toast.LENGTH_SHORT).show();
                 }
             }
         }, new Response.ErrorListener() {
@@ -161,39 +157,15 @@ public class DoctorPatientDetail extends AppCompatActivity {
                 };
                 jsonObjectRequest.setShouldCache(false);
                 Volley.newRequestQueue(getApplication()).add(jsonObjectRequest);
-        //        mHandler.postDelayed(this,60000);
                 }
         };
         mHandler.postDelayed(timer1,60000);
-
-
-
-
-        /*LineGraphSeries<DataPoint> seriesLow=new LineGraphSeries<DataPoint>(new DataPoint[]{
-                new DataPoint(0,60),
-                new DataPoint(200,60)
-
-
-        });
-        LineGraphSeries<DataPoint> seriesHigh=new LineGraphSeries<DataPoint>(new DataPoint[]{
-                new DataPoint(0,85),
-                new DataPoint(200,85)
-
-
-        });*/
         graph.setTitle("Heart Rate Log");
-
-        //graph.addSeries(seriesLow);
-        //graph.addSeries(seriesHigh);
-        //seriesLow.setColor(Color.BLUE);
-        //seriesHigh.setColor(Color.BLUE);
-        //graph.getViewport().setScalable(true);
         graph.getViewport().setScrollable(true);
         seriesHR.setDrawDataPoints(true);
         seriesHR.setDataPointsRadius(5);
         seriesHR.setColor(Color.GREEN);
         StaticLabelsFormatter staticLabelsFormatter = new StaticLabelsFormatter(graph);
-        //staticLabelsFormatter.setHorizontalLabels(new String[] {"0", "2", "4","6","8","10","12","14","16","18","20","22"});
         staticLabelsFormatter.setVerticalLabels(new String[] {"50", "70", "90","110","130"});
         graph.getViewport().setYAxisBoundsManual(true);
         graph.getViewport().setXAxisBoundsManual(true);
@@ -207,7 +179,7 @@ public class DoctorPatientDetail extends AppCompatActivity {
         seriesHR.setOnDataPointTapListener(new OnDataPointTapListener() {
             @Override
             public void onTap(Series series, DataPointInterface dataPoint) {
-                Toast.makeText(DoctorPatientDetail.this, "Series: On Data Point clicked: " + dataPoint, Toast.LENGTH_SHORT).show();
+                Toast.makeText(DoctorPatientDetail.this, "Heart Rate: " + dataPoint.getY(), Toast.LENGTH_SHORT).show();
             }
         });
 

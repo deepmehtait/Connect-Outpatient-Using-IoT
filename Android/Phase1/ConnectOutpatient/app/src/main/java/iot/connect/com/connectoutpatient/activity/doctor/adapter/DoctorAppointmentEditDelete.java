@@ -1,9 +1,9 @@
-package iot.connect.com.connectoutpatient.activity.doctor;
+package iot.connect.com.connectoutpatient.activity.doctor.adapter;
 
 import android.app.DatePickerDialog;
 import android.app.Dialog;
+import android.content.Intent;
 import android.content.SharedPreferences;
-import android.graphics.Color;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
@@ -28,93 +28,46 @@ import com.google.gson.Gson;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.concurrent.ExecutionException;
 
 import iot.connect.com.connectoutpatient.R;
 import iot.connect.com.connectoutpatient.modals.AddAppoinment;
-import iot.connect.com.connectoutpatient.modals.MyPatientList;
-import iot.connect.com.connectoutpatient.modals.MyPatientListDetails;
 import iot.connect.com.connectoutpatient.utils.AppBaseURL;
 import iot.connect.com.connectoutpatient.utils.AppStatus;
 
 /**
- * Created by Deep on 05-May-16.
+ * Created by Deep on 09-May-16.
  */
-public class DoctorSetAppointment extends AppCompatActivity {
+public class DoctorAppointmentEditDelete extends AppCompatActivity {
     SharedPreferences sharedpreferences;
-    Spinner times,patientName;
     ImageButton imageButton;
-    TextView tv;
+    Spinner times;
+    TextView tv,patientNametv;
     int year_x, month_x, date_x;
     static final int DILOG_ID = 0;
-    Button btnConfirm;
+    Button btnedit,btndelete;
     HashMap<String,String> dateset;
-
-
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_doctor_appointment_form);
-        sharedpreferences = getSharedPreferences("ConnectIoT", getApplicationContext().MODE_PRIVATE);
-        final String email=sharedpreferences.getString("email","");
-        final String userName=sharedpreferences.getString("username","");
-        final HashMap<String,String> patientNameMapper=new HashMap<String,String>();
-        final HashMap<String,String> patientProfileMappter=new HashMap<String, String>();
-        final ArrayList<String> patientNameList=new ArrayList<String>();
-        btnConfirm=(Button)findViewById(R.id.btn_confirm);
-        patientName=(Spinner)findViewById(R.id.patientNamePicker);
-        // Get List of Patients of current doctor
-        if (AppStatus.getInstance(getApplicationContext()).isOnline()) {
+        setContentView(R.layout.activity_doctor_appointment_delete_edit);
+        tv=(TextView)findViewById(R.id.TxtViewDate);
+        patientNametv=(TextView)findViewById(R.id.patientNameApp);
+        btnedit=(Button)findViewById(R.id.btn_editApp);
+        btndelete=(Button)findViewById(R.id.btn_deleteApp);
+        Intent i=getIntent();
+        final String patientid=i.getStringExtra("patientID");
+        final String patientName=i.getStringExtra("patientName");
+        final String _id=i.getStringExtra("_id");
+        final String patientURL=i.getStringExtra("patientURL");
+        final String[] date=i.getStringExtra("date").split("T");
+        final String doctorid=i.getStringExtra("doctorID");
+        tv.setText("Date:"+date[0]);
+        patientNametv.setText(patientName);
 
 
-            String URL = AppBaseURL.BaseURL + "doctor/patients/"+userName;
-            JsonObjectRequest jsonRequest = new JsonObjectRequest(Request.Method.GET, URL, (JSONObject) null, new Response.Listener<JSONObject>() {
-
-                @Override
-                public void onResponse(JSONObject response) {
-                    // the response is already constructed as a JSONObject!
-                    Log.d("Response-", response.toString());
-                    MyPatientList mPL = new MyPatientList();
-                    Gson gs = new Gson();
-                    mPL = gs.fromJson(response.toString(), MyPatientList.class);
-
-                    if (mPL.getMessage().matches("Success")) {
-                        ArrayList<MyPatientListDetails> mpld = new ArrayList<MyPatientListDetails>(mPL.getData());
-                        for(int i=0;i<mpld.size();i++){
-                            patientNameMapper.put(mpld.get(i).getDisplayName(),mpld.get(i).getUsername());
-                            patientProfileMappter.put(mpld.get(i).getDisplayName(),mpld.get(i).getProfileImageURL());
-                            patientNameList.add(mpld.get(i).getDisplayName());
-                        }
-
-                        ArrayAdapter<String> arrayadaptername=new ArrayAdapter<String>(getApplicationContext(),android.R.layout.simple_spinner_item,patientNameList);
-                        arrayadaptername.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-                        arrayadaptername.notifyDataSetChanged();
-                        patientName.setAdapter(arrayadaptername);
-                        patientName.setBackgroundColor(Color.BLUE);
-
-                        //mypatientList.setAdapter(new DoctorMyPatientAdapter(getApplicationContext(), mpld));
-                    }
-
-
-                }
-            }, new Response.ErrorListener() {
-
-                @Override
-                public void onErrorResponse(VolleyError error) {
-
-                    error.printStackTrace();
-                }
-            });
-            jsonRequest.setShouldCache(false);
-            Volley.newRequestQueue(getApplicationContext()).add(jsonRequest);
-        } else {
-            // If no network connectivity notify user
-            Toast.makeText(getApplicationContext(), "Please Check Internet Connection", Toast.LENGTH_SHORT).show();
-        }
         // set spinner data - times
         times = (Spinner)findViewById(R.id.timepicker);
         ArrayAdapter<CharSequence> timedapter=ArrayAdapter.createFromResource(this,R.array.time,android.R.layout.simple_spinner_item);
@@ -127,26 +80,24 @@ public class DoctorSetAppointment extends AppCompatActivity {
         month_x=c.get(Calendar.MONTH);
         date_x=c.get(Calendar.DAY_OF_MONTH);
         showDialogOnButtonClick();
-        tv=(TextView)findViewById(R.id.TxtViewDate);
-        btnConfirm.setOnClickListener(new View.OnClickListener() {
+
+        // Edit
+        btnedit.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                String timevalue=null,pName=null,pUrl=null;
-                String[] date=null;
+                String timevalue=timevalue=times.getSelectedItem().toString();
+                String[] dateSet=null;
                 try{
-                    pName=patientNameMapper.get(patientName.getSelectedItem().toString());
-                    pUrl=patientProfileMappter.get(patientName.getSelectedItem().toString());
-                    timevalue=times.getSelectedItem().toString();
-                     date=tv.getText().toString().split(":");
-                }catch (Exception e){
+                    dateSet=tv.getText().toString().split(":");
+                }catch(Exception e){
                     e.printStackTrace();
                 }
                 AddAppoinment addAppoinment=new AddAppoinment();
-                addAppoinment.setDate(date[1]);
-                addAppoinment.setPatientName(patientName.getSelectedItem().toString());
-                addAppoinment.setDoctorId(userName);
-                addAppoinment.setPatientId(pName);
-                addAppoinment.setPatientProfileImageURL(pUrl);
+                addAppoinment.setDate(dateSet[1]);
+                addAppoinment.setPatientName(patientName);
+                addAppoinment.setDoctorId(doctorid);
+                addAppoinment.setPatientId(patientid);
+                addAppoinment.setPatientProfileImageURL(patientURL);
                 addAppoinment.setTime(timevalue);
 
                 JSONObject js = null;
@@ -159,19 +110,55 @@ public class DoctorSetAppointment extends AppCompatActivity {
                 } catch (JSONException e) {
                     e.printStackTrace();
                 }
-
                 if (AppStatus.getInstance(getApplicationContext()).isOnline()) {
-
-
-                    String url = AppBaseURL.BaseURL + "appointment";
+                    String url = AppBaseURL.BaseURL + "appointment/"+_id;
                     JSONObject jsonObject;
                     JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(Request.Method.POST, url,
                             js, new Response.Listener<JSONObject>() {
                         @Override
                         public void onResponse(JSONObject jsonObject) {
                             Log.d("Response", jsonObject.toString());
+                            Toast.makeText(getApplicationContext(), jsonObject.toString(), Toast.LENGTH_SHORT).show();
+                        }
+                    }, new Response.ErrorListener() {
+                        @Override
+                        public void onErrorResponse(VolleyError error) {
+                            Log.d("Error.Response", error.toString());
+                        }
+                    }
+                    ) {
+                        @Override
+                        public Map<String, String> getHeaders() throws AuthFailureError {
+                            HashMap<String, String> headers = new HashMap<String, String>();
+                            headers.put("Content-Type", "application/json; charset=utf-8");
+                            return headers;
+                        }
+                    };
+                    Volley.newRequestQueue(getApplicationContext()).add(jsonObjectRequest);
+                } else {
+                    // If no network connectivity notify user
+                    Toast.makeText(getApplicationContext(), "Please Check Internet Connection", Toast.LENGTH_SHORT).show();
+                }
+
+            }
+        });
+        // Delete Appointment
+        btndelete.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+                if (AppStatus.getInstance(getApplicationContext()).isOnline()) {
+
+
+                    String url = AppBaseURL.BaseURL + "appointment/"+_id;
+                    JSONObject jsonObject;
+                    JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(Request.Method.DELETE, url,
+                            new JSONObject(), new Response.Listener<JSONObject>() {
+                        @Override
+                        public void onResponse(JSONObject jsonObject) {
+                            Log.d("Response", jsonObject.toString());
+                            Toast.makeText(getApplicationContext(), jsonObject.toString(), Toast.LENGTH_SHORT).show();
                             finish();
-                            //Toast.makeText(getApplicationContext(), jsonObject.toString(), Toast.LENGTH_SHORT).show();
 
                         }
                     }, new Response.ErrorListener() {
@@ -193,9 +180,9 @@ public class DoctorSetAppointment extends AppCompatActivity {
                     // If no network connectivity notify user
                     Toast.makeText(getApplicationContext(), "Please Check Internet Connection", Toast.LENGTH_SHORT).show();
                 }
+
             }
         });
-
 
 
     }

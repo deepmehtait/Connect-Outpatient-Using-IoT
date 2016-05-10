@@ -5,6 +5,7 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.os.Bundle;
+import android.os.Handler;
 import android.support.annotation.Nullable;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
@@ -13,6 +14,7 @@ import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.android.volley.AuthFailureError;
@@ -40,6 +42,7 @@ import java.util.Map;
 
 import iot.connect.com.connectoutpatient.R;
 import iot.connect.com.connectoutpatient.activity.doctor.DoctorDashboardActivity;
+import iot.connect.com.connectoutpatient.modals.HealthData;
 import iot.connect.com.connectoutpatient.modals.SignIn;
 import iot.connect.com.connectoutpatient.utils.AppBaseURL;
 
@@ -52,6 +55,10 @@ public class PatientDashboardActivity extends AppCompatActivity {
     RecyclerView recyclerView;
     SharedPreferences sharedpreferences;
     GraphView graph;
+    TextView min,max,average;
+    Runnable timer1;
+    int count=0;
+    private final Handler mHandler = new Handler();
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -77,90 +84,34 @@ public class PatientDashboardActivity extends AppCompatActivity {
         recyclerView.setHasFixedSize(true);
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
 
+        min=(TextView)findViewById(R.id.minValue);
+        max=(TextView)findViewById(R.id.maxValue);
+        average=(TextView)findViewById(R.id.averageValue);
 
         graph = (GraphView) findViewById(R.id.graph);
-        LineGraphSeries<DataPoint> series = new LineGraphSeries<DataPoint>(new DataPoint[]{
-                new DataPoint(0, 71),
-                new DataPoint(1, 75),
-                new DataPoint(2, 63),
-                new DataPoint(3, 82),
-                new DataPoint(4, 66), new DataPoint(5, 81),
-                new DataPoint(6, 85),
-                new DataPoint(7, 83),
-                new DataPoint(8, 72),
-                new DataPoint(9, 76), new DataPoint(10, 71),
-                new DataPoint(11, 65),
-                new DataPoint(12, 63),
-                new DataPoint(13, 72),
-                new DataPoint(14, 76)
-        });
-        LineGraphSeries<DataPoint> seriesLow=new LineGraphSeries<DataPoint>(new DataPoint[]{
-                new DataPoint(0,60),
-                new DataPoint(23,60)
+        final LineGraphSeries<DataPoint> seriesHR=new LineGraphSeries<DataPoint>();
 
-
-        });
-        LineGraphSeries<DataPoint> seriesHigh=new LineGraphSeries<DataPoint>(new DataPoint[]{
-                new DataPoint(0,100),
-                new DataPoint(23,100)
-
-
-        });
-        graph.setTitle("Heart Rate Log");
-        graph.addSeries(series);
-        graph.addSeries(seriesLow);
-        graph.addSeries(seriesHigh);
-        seriesLow.setColor(Color.GREEN);
-        seriesHigh.setColor(Color.GREEN);
-
-        series.setDrawDataPoints(true);
-        series.setDataPointsRadius(5);
-
-        StaticLabelsFormatter staticLabelsFormatter = new StaticLabelsFormatter(graph);
-        staticLabelsFormatter.setHorizontalLabels(new String[] {"0", "2", "4","6","8","10","12","14","16","18","20","22"});
-        staticLabelsFormatter.setVerticalLabels(new String[] {"50", "70", "90","110","130","150"});
-        graph.getViewport().setYAxisBoundsManual(true);
-        graph.getViewport().setXAxisBoundsManual(true);
-        graph.getViewport().setMaxY(23);
-        graph.getViewport().setMinX(0);
-        graph.getViewport().setMinY(50);
-        graph.getViewport().setMaxY(170);
-
-        graph.getGridLabelRenderer().setLabelFormatter(staticLabelsFormatter);
-        series.setOnDataPointTapListener(new OnDataPointTapListener() {
-            @Override
-            public void onTap(Series series, DataPointInterface dataPoint) {
-                Toast.makeText(PatientDashboardActivity.this, "Series: On Data Point clicked: " + dataPoint, Toast.LENGTH_SHORT).show();
-            }
-        });
-
-
-
-
-
-
-        //Register Token
-        /*String username=sharedpreferences.getString("username","");
-        String UUID=sharedpreferences.getString("UUID","null");
-        String token=sharedpreferences.getString("token","null");
-        JSONObject obj=new JSONObject();
-        try{
-            obj.put("username",username);
-            obj.put("uuid",UUID);
-            obj.put("token",token);
-
-        }catch(JSONException e){
-            e.printStackTrace();
-        }
-        Log.d("Request=",obj.toString());
-        String url= AppBaseURL.BaseURL+"deviceToken";
-        JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(Request.Method.POST, url,
-                obj, new Response.Listener<JSONObject>() {
+        // get fitbit data
+        String url= AppBaseURL.BaseURL+"fitbitdata/testuser1";
+        JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(Request.Method.GET, url,
+                new JSONObject(), new Response.Listener<JSONObject>() {
             @Override
             public void onResponse(JSONObject jsonObject) {
                 Log.d("Response", jsonObject.toString());
-                Toast.makeText(getApplicationContext(),jsonObject.toString(),Toast.LENGTH_SHORT).show();
+                Gson gs=new Gson();
+                HealthData healthData=gs.fromJson(jsonObject.toString(),HealthData.class);
+                if(healthData.getResult()==null){
+                    min.setText(healthData.getMinValue());
+                    max.setText(healthData.getMaxValue());
+                    average.setText(healthData.getAvgValue());
+                    Log.d("length-",""+healthData.getHealthdata().size());
 
+                    for(int i=0;i<healthData.getHealthdata().size();i++){
+                        Log.d("i-",healthData.getHealthdata().get(i).getValue()+","+i);
+                        seriesHR.appendData(new DataPoint(getCount(),Double.parseDouble( healthData.getHealthdata().get(i).getValue())),true,50);
+                    }
+                    graph.addSeries(seriesHR);
+                }
             }
         }, new Response.ErrorListener() {
             @Override
@@ -176,7 +127,80 @@ public class PatientDashboardActivity extends AppCompatActivity {
                 return headers;
             }
         };
-        Volley.newRequestQueue(getApplicationContext()).add(jsonObjectRequest);*/
+        jsonObjectRequest.setShouldCache(false);
+        Volley.newRequestQueue(getApplication()).add(jsonObjectRequest);
+
+
+        timer1=new Runnable() {
+            @Override
+            public void run() {
+                Log.d("run","run now");
+                String url= AppBaseURL.BaseURL+"fitbitdata/testuser1";
+                JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(Request.Method.GET, url,
+                        new JSONObject(), new Response.Listener<JSONObject>() {
+                    @Override
+                    public void onResponse(JSONObject jsonObject) {
+                        Log.d("Response", jsonObject.toString());
+                        Gson gs=new Gson();
+                        HealthData healthData=gs.fromJson(jsonObject.toString(),HealthData.class);
+                        if(healthData.getResult()==null){
+                            min.setText(healthData.getMinValue());
+                            max.setText(healthData.getMaxValue());
+                            average.setText(healthData.getAvgValue());
+                            Log.d("length-",""+healthData.getHealthdata().size());
+                            for(int i=0;i<healthData.getHealthdata().size();i++){
+                                Log.d("i-",healthData.getHealthdata().get(i).getValue()+","+i);
+                                seriesHR.appendData(new DataPoint(getCount(),Double.parseDouble( healthData.getHealthdata().get(i).getValue())),true,50);
+                            }
+                            graph.addSeries(seriesHR);
+                            //Toast.makeText(context,jsonObject.toString(),Toast.LENGTH_SHORT).show();
+                        }
+                    }
+                }, new Response.ErrorListener() {
+                    @Override
+                    public void onErrorResponse(VolleyError error) {
+                        Log.d("Error.Response", error.getMessage());
+                    }
+                }
+                ){
+                    @Override
+                    public Map<String, String> getHeaders() throws AuthFailureError {
+                        HashMap<String, String> headers = new HashMap<String, String>();
+                        headers.put("Content-Type", "application/json; charset=utf-8");
+                        return headers;
+                    }
+                };
+                jsonObjectRequest.setShouldCache(false);
+                Volley.newRequestQueue(getApplication()).add(jsonObjectRequest);
+            }
+        };
+        mHandler.postDelayed(timer1,60000);
+        graph.setTitle("Heart Rate Log");
+        graph.getViewport().setScrollable(true);
+        seriesHR.setDrawDataPoints(true);
+        seriesHR.setDataPointsRadius(5);
+        seriesHR.setColor(Color.GREEN);
+        StaticLabelsFormatter staticLabelsFormatter = new StaticLabelsFormatter(graph);
+        staticLabelsFormatter.setVerticalLabels(new String[] {"50", "70", "90","110","130"});
+        graph.getViewport().setYAxisBoundsManual(true);
+        graph.getViewport().setXAxisBoundsManual(true);
+
+        graph.getViewport().setMinX(0);
+        graph.getViewport().setMinY(50);
+        graph.getViewport().setMaxY(130);
+        graph.getViewport().setScrollable(true);
+        graph.getViewport().setScalable(true);
+        graph.getGridLabelRenderer().setLabelFormatter(staticLabelsFormatter);
+        seriesHR.setOnDataPointTapListener(new OnDataPointTapListener() {
+            @Override
+            public void onTap(Series series, DataPointInterface dataPoint) {
+                Toast.makeText(PatientDashboardActivity.this, "Heart Rate: " + dataPoint.getY(), Toast.LENGTH_SHORT).show();
+            }
+        });
+
+    }
+    private int  getCount(){
+        return count++;
 
     }
 }

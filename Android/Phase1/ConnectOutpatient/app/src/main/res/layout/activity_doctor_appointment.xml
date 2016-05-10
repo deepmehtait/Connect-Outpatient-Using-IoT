@@ -28,12 +28,18 @@
             android:background="@color/icons"
             android:fitsSystemWindows="true"
             android:orientation="vertical">
-        <ListView
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:id="@+id/appointmentListView">
+            <android.support.v4.widget.SwipeRefreshLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:id="@+id/swiperefresh">
+                <ListView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:id="@+id/appointmentListView">
 
-        </ListView>
+                </ListView>
+            </android.support.v4.widget.SwipeRefreshLayout>
+
 
             <ImageButton
                 android:layout_width="56dp"

@@ -4,6 +4,7 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
+import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
@@ -33,7 +34,7 @@ import iot.connect.com.connectoutpatient.utils.AppStatus;
 /**
  * Created by Deep on 04-May-16.
  */
-public class DoctorViewPatientMedication extends AppCompatActivity {
+public class DoctorViewPatientMedication extends AppCompatActivity  {
     ListView dayMedication;
     ListAdapter adapter;
     SharedPreferences sharedpreferences;
@@ -49,6 +50,7 @@ public class DoctorViewPatientMedication extends AppCompatActivity {
         toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
         setTitle("Patient Medication");
+
         if (AppStatus.getInstance(getApplicationContext()).isOnline()) {
 
 
@@ -79,12 +81,7 @@ public class DoctorViewPatientMedication extends AppCompatActivity {
                     }
                     adapter=new DaysOfWeekAdapter(getApplicationContext(),dayAndMedications,pusername);
                     dayMedication.setAdapter(adapter);
-                    //DaysOfWeekData daysOfWeekData=new DaysOfWeekData();
-                    //Gson gs = new Gson();
 
-                    //daysOfWeekData=gs.fromJson(response.toString(),DaysOfWeekData.class);
-                    //Log.d("Arrlis","Size = "+daysOfWeekData.getDaysofweek().size());
-                    //dayMedication.setAdapter(new DaysOfWeekAdapter(getApplicationContext(),daysOfWeekData.getDaysofweek()));
                 }
             }, new Response.ErrorListener() {
 
@@ -107,5 +104,6 @@ public class DoctorViewPatientMedication extends AppCompatActivity {
         super.onResume();
        // adapter.notifyAll();
     }
+
 
 }
