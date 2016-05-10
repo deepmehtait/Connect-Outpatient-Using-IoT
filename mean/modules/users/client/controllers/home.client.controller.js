@@ -1,7 +1,7 @@
 'use strict';
 
-angular.module('core').controller('HomeController', ['$scope', '$stateParams','$uibModal', '$http', 'Socket', 'Authentication',
-    function ($scope, $stateParams, $uibModal,$http, Socket, Authentication) {
+angular.module('core').controller('HomeController', ['$scope','$filter', '$stateParams','$uibModal', '$http', 'Socket', 'Authentication',
+    function ($scope, $filter, $stateParams, $uibModal,$http, Socket, Authentication) {
         // This provides Authentication context
         $scope.authentication = Authentication;
         $scope.isDoctor = false;
@@ -131,7 +131,6 @@ angular.module('core').controller('HomeController', ['$scope', '$stateParams','$
         }
 
         $scope.deleteMedication = function(medicationInfo){
-            console.log(medicationInfo);
             $http.delete('/medication/' + $scope.patientId + '/' + medicationInfo.name).success(function (response) {
 
             }).error(function (response) {
@@ -140,82 +139,12 @@ angular.module('core').controller('HomeController', ['$scope', '$stateParams','$
         }
 
 
-
-        //Open Appointment Modal***********************************************
-
-        //Time Picker Options
-        $scope.appointmentTime = new Date();
-        $scope.hstep = 1;
-        $scope.mstep = 5;
-        $scope.ismeridian = true;
-
-        //Date Picker options
-        $scope.appointmentDate = new Date();
-        $scope.dateOptions = {
-            startingDay: 1,
-            initDate: new Date()
-        };
-        $scope.open1 = function() {
-            $scope.popup1.opened = true;
-        };
-        $scope.formats = ['dd-MMMM-yyyy', 'yyyy/MM/dd', 'dd.MM.yyyy','dd-MMMM-yyyy', 'shortDate'];
-        $scope.format = $scope.formats[0];
-        //$scope.altInputFormats = ['M!/d!/yyyy'];
-        $scope.popup1 = {
-            opened: false
-        };
-
-        $scope.addAppointment = function (){
-            $scope.appointmentDate = new Date();
-            $scope.appointmentDate.setDate($scope.appointmentDate.getDate()-7);
-            $scope.appointmentModalTitle = "Add Appointment";
-            $scope.appointmentModalInstance = $uibModal.open({
-                templateUrl: 'modules/users/client/views/appointment.client.view.html',
-                controller: 'HomeController',
-                scope:$scope
-            });
-
-            $scope.appointmentModalInstance.result.then(function (data) {
-                var payload = {
-                    "patientId": $scope.patientId,
-                    "medications": {
-                        "name": data.medicationName,
-                        "dosage": data.medicationDosage,
-                        "doctorId": Authentication.user.username,
-                        "company": data.medicationCompany,
-                        "day": data.medicationDay,
-                        "time": data.medicationTime
-                    }
-                }
-                $http.post('/medication',payload).success(function (response) {
-                }).error(function (response) {
-                    $scope.error = response.message;
-                });
-            }, function () {
-
-            });
-        }
-
-
-        $scope.saveAppointmentForm = function () {
-            $scope.appointmentModalInstance.close({
-
-
-
-            });
-        }
-
-        $scope.closeAppointmentForm = function () {
-            $scope.appointmentModalInstance.dismiss('cancel');
-        }
-
-
-
-
-
-
         //Handle socket events*************************
         Socket.on('medication.created', function (data) {
+            $scope.addMedicationToList(data);
+        });
+
+        $scope.addMedicationToList = function(data){
             $scope.clientMedications.push({
                 "name": data.medications.name,
                 "dosage": data.medications.dosage,
@@ -224,12 +153,21 @@ angular.module('core').controller('HomeController', ['$scope', '$stateParams','$
                 "day": data.medications.day,
                 "time": data.medications.time
             });
-        });
+        }
 
         Socket.on('medication.removed', function (data) {
             angular.forEach($scope.clientMedications, function (medicationInfo, index) {
-                if (medicationInfo.name == data) {
+                if (medicationInfo.name == data.medicineName && $scope.patientId == data.patientId) {
                     $scope.clientMedications.splice(index, 1);
+                }
+            });
+        });
+
+        Socket.on('medication.updated', function (data) {
+            angular.forEach($scope.clientMedications, function (medicationInfo, index) {
+                if (medicationInfo.name == data.medicineName && $scope.patientId == data.patientId) {
+                    $scope.clientMedications.splice(index, 1);
+                    $scope.addMedicationToList(data.updatedInfo);
                 }
             });
         });
@@ -300,13 +238,20 @@ angular.module('core').controller('HomeController', ['$scope', '$stateParams','$
         $http.get('/appointment/' + $scope.patientId).success(function (response) {
             if (response && response.data) {
                 for (var i = 0; i < response.data.length; i++) {
-                    var newEvent = {type: 'info', draggable: false, resizable: false};
+                    var newEvent = {type: 'info', draggable: false, resizable: false, editable: false, deletable:false};
                     newEvent.startsAt = moment(response.data[i].date);
                     newEvent.endsAt = moment(response.data[i].date);
+                    newEvent.data = response.data[i];
                     newEvent.title = '<img class="header-profile-image" alt="' + response.data[i].doctorName + '" ' +
                         'ng-src="' + response.data[i].doctorProfileImageURL + '" ' +
                         'src="' + response.data[i].doctorProfileImageURL + '"> ' +
                         '<span class="text-primary">' + response.data[i].doctorName + '</span>';
+
+                    if($scope.isDoctor){
+                        newEvent.editable = true;
+                        newEvent.deletable = true;
+                    }
+
                     if (!showListFilter || (showListFilter && showListFilter == response.data[i].doctorId)) {
                         $scope.events.push(newEvent);
                     }
@@ -317,15 +262,139 @@ angular.module('core').controller('HomeController', ['$scope', '$stateParams','$
         });
 
 
-        /*$scope.events = [
-         {
-         title: '<i class="glyphicon glyphicon-asterisk"></i> <span class="text-primary">Another event</span>, with a <i>html</i> title',
-         type: 'info',
-         startsAt: moment().subtract(1, 'day').toDate(),
-         endsAt: moment().add(5, 'days').toDate(),
-         draggable: true,
-         resizable: false
-         }
-         ];*/
+
+        //Open Appointment Modal***********************************************
+
+        //Time Picker Options
+        $scope.hstep = 1;
+        $scope.mstep = 5;
+        $scope.ismeridian = true;
+
+        //Date Picker options
+        $scope.appointmentDate = new Date();
+        $scope.dateOptions = {
+            startingDay: 1
+        };
+        $scope.open1 = function() {
+            $scope.popup1.opened = true;
+        };
+        $scope.formats = ['dd-MMMM-yyyy', 'yyyy/MM/dd', 'dd.MM.yyyy','dd-MMMM-yyyy', 'shortDate'];
+        $scope.format = $scope.formats[0];
+        //$scope.altInputFormats = ['M!/d!/yyyy'];
+        $scope.popup1 = {
+            opened: false
+        };
+
+        $scope.deleteAppointment = function (selectedEvent) {
+            $http.delete('/appointment/' + selectedEvent.data._id).success(function (response) {
+            }).error(function (response) {
+                $scope.error = response.message;
+            });
+        }
+
+        //Edit Appointments**
+        $scope.editAppointment = function(selectedEvent){
+            $scope.appointmentDate = $filter('date')(selectedEvent.data.date, "dd-MMMM-yyyy");
+            $scope.dateOptions.initDate = $filter('date')(selectedEvent.data.date, "dd-MMMM-yyyy");
+            $scope.appointmentModalTitle = "Edit Appointment";
+            $scope.appointmentTime =  moment(selectedEvent.data.time, "HH:mm").toDate();;
+            $scope.appointmentModalInstance = $uibModal.open({
+                templateUrl: 'modules/users/client/views/appointment.client.view.html',
+                controller: 'HomeController',
+                scope: $scope
+            });
+            $scope.appointmentModalInstance.result.then(function (data) {
+                var payload = {
+                    "patientId": data.patientId,
+                    "patientName": data.patientName,
+                    "doctorId": Authentication.user.username,
+                    "date": data.date,
+                    "time": data.time,
+                }
+                $http.post('/appointment/'+ selectedEvent.data._id,payload).success(function (response) {
+                }).error(function (response) {
+                    $scope.error = response.message;
+                });
+            }, function () {
+            });
+        }
+
+
+        $scope.addAppointment = function (){
+            $scope.appointmentDate = new Date();
+            $scope.appointmentTime = new Date();
+            $scope.appointmentModalTitle = "Add Appointment";
+            $scope.appointmentModalInstance = $uibModal.open({
+                templateUrl: 'modules/users/client/views/appointment.client.view.html',
+                controller: 'HomeController',
+                scope:$scope
+            });
+
+            $scope.appointmentModalInstance.result.then(function (data) {
+                var payload = {
+                    "patientId": data.patientId,
+                    "patientName": data.patientName,
+                    "doctorId": Authentication.user.username,
+                    "date": data.date,
+                    "time": data.time,
+                }
+                console.log(payload);
+                $http.post('/appointment',payload).success(function (response) {
+                }).error(function (response) {
+                    $scope.error = response.message;
+                });
+            }, function () {
+            });
+        }
+
+        $scope.saveAppointmentForm = function () {
+            $scope.appointmentModalInstance.close({
+                "date": $scope.appointmentDate,
+                "time": $scope.appointmentTime,
+                "patientId" : $scope.patientId,
+                "patientName":  $scope.patientName
+            });
+        }
+
+        $scope.closeAppointmentForm = function () {
+            $scope.appointmentModalInstance.dismiss('cancel');
+        }
+
+        //********************Handle Socket Notifications for Appointments*****************************************
+
+        Socket.on('appointment.added', function (data) {
+            $scope.addAppointmentToList(data);
+        });
+
+        Socket.on('appointment.updated', function (data) {
+            console.log('appointment updated', data);
+            angular.forEach($scope.events, function (appointmentInfo, index) {
+                if (appointmentInfo.data._id == data.appointmentId) {
+                    $scope.events.splice(index, 1);
+                    $scope.addAppointmentToList(data.newAppointment);
+                }
+            });
+        });
+
+        Socket.on('appointment.deleted', function (data) {
+            angular.forEach($scope.events, function (appointmentInfo, index) {
+                if (appointmentInfo.data._id == data) {
+                    $scope.events.splice(index, 1);
+                }
+            });
+        });
+
+        $scope.addAppointmentToList = function(data){
+            var newEvent = {type: 'info', draggable: false, resizable: false, editable: true, deletable:true};
+            newEvent.startsAt = moment(data.date);
+            newEvent.endsAt = moment(data.date);
+            newEvent.data = data;
+            newEvent.title = '<img class="header-profile-image" ' +
+                'ng-src="' + data.patientProfileImageURL + '" ' +
+                'src="' + data.patientProfileImageURL + '"> ' +
+                '<span class="text-primary">' + data.patientName + '</span>';
+            $scope.events.push(newEvent);
+        }
+
     }
 ]);

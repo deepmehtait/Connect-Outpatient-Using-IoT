@@ -5,11 +5,19 @@
   <div class="modal-body">
     <form name="appointmentForm" class="signin" novalidate autocomplet+e="off">
       <fieldset>
-        <div class="form-group">
+        <div class="form-group" ng-if="!clientList">
           <label for="patientName">Patient Name</label>
           <input type="text" id="patientName" name="patientName" class="form-control" ng-model="patientName"
                  placeholder="" required>
           <div ng-show="appointmentForm.patientName.$dirty && appointmentForm.patientName.$invalid" role="alert">
+            <span style="color:red">Patient name is required.</span>
+          </div>
+        </div>
+
+        <div class="form-group" ng-if="clientList">
+          <label>Patient Name</label>
+          <select class="form-control" name="patientNameD" ng-model="selectedPatient.patientNameD" ng-options="cl as cl.displayName for cl in clientList" required></select>
+          <div ng-show="appointmentForm.patientNameD.$dirty && appointmentForm.patientNameD.$invalid" role="alert">
             <span style="color:red">Patient name is required.</span>
           </div>
         </div>

@@ -25,7 +25,7 @@
               <td>{{cl.emergencyContactName}}
                 <br> {{cl.emergencyContactNumber}}
               </td>
-       		  <td><a ui-sref="patient({patientDetail: cl})">Details</a></td>
+       		  <td><a ui-sref="patient({patientDetail: cl })">Details</a></td>
            </tr>
             </tbody>
           </table>
@@ -41,13 +41,12 @@
         <mwl-calendar
           view="calendarView",
           view-date="calendarDate"
-          events="events"
+          events="doctorEvents"
           view-title="MyTitle"
-          edit-event-html="'<i class=glyphicon glyphicon-pencil></i>'"
-          delete-event-html="'<i class=glyphicon glyphicon-remove></i>'"
-          on-edit-event-click="eventEdited(calendarEvent)"
-          on-delete-event-click="eventDeleted(calendarEvent)"
-          on-event-click="eventClicked(calendarEvent)"
+          edit-event-html="'<i class=\'glyphicon glyphicon-pencil\'></i>'"
+          delete-event-html="'<i class=\'glyphicon glyphicon-remove\'></i>'"
+          on-edit-event-click="editAppointment(calendarEvent)"
+          on-delete-event-click="deleteAppointment(calendarEvent)"
           cell-is-open="false">
         </mwl-calendar>
 
