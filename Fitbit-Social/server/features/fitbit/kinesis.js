@@ -20,7 +20,7 @@
 
 
 
-            update: function update(fitbitData, heartRateToday, sensorid, value2, avg) {
+            update: function update(fitbitData, heartRateToday, sensorid, value2,max, min, avg) {
                 console.log("it comes here inside kinesis.js update");
                 var date = new Date();
                 var sensoridd = sensorid;
@@ -37,6 +37,9 @@
                 //         json: {
                 //             "username": user,
                 //             "fitbitUsername": sensorid,
+                //             "average": avg,
+                //             "max" : max,
+                //             "min": min,
                 //             "healthdata": {
                 //                 "timestamp": date,
                 //                 "value": value2
@@ -75,6 +78,8 @@
                                         "username" : user,
                                         "fitbitUsername" : sensorid,
                                         "average": avg,
+                                        "max" : max,
+                                        "min": min,
                                         "healthdata" : {
                                             "timestamp" : date,
                                             "value" : vString

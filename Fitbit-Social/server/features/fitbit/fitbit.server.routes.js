@@ -25,6 +25,7 @@ var previousMinute;
 var sensorid;
 var BASE_OPTIONS;
 var REFRESH_OPTIONS;
+var valueForMinMax = [];
 var avg;
 var count = 0;
 
@@ -273,7 +274,7 @@ module.exports = function(app, passport) {
                         // console.log(str);
                         var value = JSON.parse(fitbitCronData.heartRateCronToday2);
 
-
+                        // console.log(str);
                         if (value !== undefined) {
                             if (!value.hasOwnProperty('categories')) {
 
@@ -282,6 +283,20 @@ module.exports = function(app, passport) {
                                     if (value.activitiesOfHeart[0].value != undefined) {
                                         var value2 = value.activitiesHeartIntraday.dataset[value.activitiesHeartIntraday.dataset.length - 1].value;
 
+                                        
+
+                                        for(var i=0; i<value.activitiesHeartIntraday.dataset.length;i++){
+                                           
+                                            valueForMinMax[i] = value.activitiesHeartIntraday.dataset[i].value;
+                                        }
+
+                                        var max_of_array = Math.max.apply(Math, valueForMinMax);
+
+                                        var min_of_array = Math.min.apply(Math, valueForMinMax);
+
+                                        console.log("minimum heart rate = " + min_of_array);
+
+                                        console.log("maximum heart rate = " +max_of_array);
 
                                         var value3 = value.activitiesHeartIntraday.dataset[value.activitiesHeartIntraday.dataset.length - 1].time;
 
@@ -289,7 +304,7 @@ module.exports = function(app, passport) {
 
                                         avg = value.activitiesOfHeart[0].value;
                                     
-                                        kinesis.update(fitbitData, fitbitData.heartRateToday, sensorid, value2, avg);
+                                        kinesis.update(fitbitData, fitbitData.heartRateToday, sensorid, value2, max_of_array, min_of_array, avg);
 
                                         previousHour = result[0];
                                         
