@@ -18,6 +18,9 @@
     "lodash": "^4.7.0",
     "passport": "^0.3.2",
     "passport-fitbit-oauth2": "^1.0.1",
+    "aws-sdk": "*",
+    "node-schedule": "*",
+    "json-jquery" : "*",
     "request": "^2.69.0"
   },
   "devDependencies": {}
