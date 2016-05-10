@@ -201,7 +201,7 @@ module.exports = function(app, passport) {
                 });
 
 
-                var pushData = schedule.scheduleJob('*/10 * * * * *', function() {
+                var pushData = schedule.scheduleJob('* * * * *', function() {
                     sensorid = userCredentials.userId;
                     // console.log(userCredentials.refreshToken);
                     // console.log(BASE_OPTIONS);
@@ -235,12 +235,12 @@ module.exports = function(app, passport) {
                         // heartRateCronOptions2         = _.cloneDeep(BASE_OPTIONS);
                         heartRateCronOptions2.url = FITBIT_BASE_URL + '/activities/heart/date/' + yes + '/1d/1min/time/00:00/' + cronHour + ':' + cronMinute + '.json';
 
-                        // heartRateCronOptions2.url         = FITBIT_BASE_URL + '/activities/heart/date/2016-04-24/1d/1min/time/00:00/'+cronHour+':'+cronMinute+'.json';
+                        // heartRateCronOptions2.url         = FITBIT_BASE_URL + '/activities/heart/date/2016-05-06/1d/1min/time/00:00/'+cronHour+':'+cronMinute+'.json';
                         count++;
                     } else {
                         // heartRateCronOptions2         = _.cloneDeep(BASE_OPTIONS);
                         heartRateCronOptions2.url = FITBIT_BASE_URL + '/activities/heart/date/' + yes + '/1d/1min/time/00:00/' + cronHour + ':' + cronMinute + '.json';
-                        // heartRateCronOptions2.url         = FITBIT_BASE_URL + '/activities/heart/date/today/1d/1sec/time/'+ previousHour + ':'+previousMinute+ '/'+cronHour+':'+cronMinute+'.json';
+                        // heartRateCronOptions2.url         = FITBIT_BASE_URL + '/activities/heart/date/2016-05-06/1d/1min/time/00:00/'+cronHour+':'+cronMinute+'.json';
                         count++;
 
                     }
