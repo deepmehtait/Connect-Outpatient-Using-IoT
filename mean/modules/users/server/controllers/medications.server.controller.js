@@ -70,9 +70,7 @@ exports.deleteMedication = function (req, res) {
           message: errorHandler.getErrorMessage(err)
         });
       } else if(data && data.nModified > 0) {
-          if(socketio.sockets.connected[patientId]) {
-              socketio.sockets.connected[patientId].emit('medication.removed', medicineName);
-          }
+          socketio.sockets.emit('medication.removed', {"medicineName":medicineName, "patientId":patientId});
           res.json({ 'Result': 'Medication deleted successfully' });
         }
         else{
@@ -91,6 +89,7 @@ exports.updateMedication = function (req, res) {
     var patientId = req.params.patientId;
     var medicineName = req.params.medicationName;
     var updatedInfo = new Medication(req.body);
+    var socketio = req.app.get('socketio'); // take out socket instance from the app container
     if(patientId && medicineName ) {
         Medication.update({ patientId: patientId , medications: { $elemMatch: { name: medicineName } } },{ $set: { "medications.$" : updatedInfo.medications } },function (err, data) {
             console.log(data);
@@ -99,6 +98,7 @@ exports.updateMedication = function (req, res) {
                     message: errorHandler.getErrorMessage(err)
                 });
             } else if(data && data.nModified > 0) {
+                socketio.sockets.emit('medication.updated', {"medicineName":medicineName, "patientId":patientId, "updatedInfo": updatedInfo});
                 res.json({ 'Result': 'Medication information updated successfully' });
             }
             else{
