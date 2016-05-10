@@ -14,16 +14,19 @@
         // Init Variables
       var socketio = req.app.get('socketio');
       var fitbit_data = new Fitbitdata(req.body);
-      console.log(req.body);
+      fitbit_data.minValue = req.body.min;
+      fitbit_data.maxValue = req.body.max;
+      fitbit_data.avgValue = req.body.average;
       var message = null;
       Fitbitdata.update({ fitbitUsername: fitbit_data.fitbitUsername },
-         { $push: { 'healthdata': fitbit_data.healthdata } }, { upsert: true }, function (err, data) {
+         { $push: { 'healthdata': fitbit_data.healthdata }, $set: {"minValue":req.body.min,
+             "maxValue": req.body.max, "avgValue":req.body.average} },{ upsert: true }, function (err, data) {
            if (err) {
              return res.status(400).send({
                message: errorHandler.getErrorMessage(err)
              });
            } else {
-             socketio.emit('FitbitData.received', fitbit_data.healthdata);
+             socketio.emit('FitbitData.received', fitbit_data);
              res.json({ 'Result': 'Fitbit data stored successfully' });
            }
          });

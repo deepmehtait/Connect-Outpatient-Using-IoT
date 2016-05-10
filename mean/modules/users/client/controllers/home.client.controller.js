@@ -8,8 +8,9 @@ angular.module('core').controller('HomeController', ['$scope','$filter', '$state
         $scope.patientId = Authentication.user.username;
         $scope.patientHomeTitle = Authentication.user.firstName + "'s Status";
         $scope.patientName = Authentication.user.displayName;
-
-        console.log($stateParams.patientDetail);
+        $scope.dailyMin = "0";
+        $scope.dailyMax = "0";
+        $scope.dailyAvg = "0";
         //Set vars if coming from doctor dashboard
         var showListFilter = "";
         if (Authentication.user.roles.indexOf('doctor') > -1) {
@@ -207,23 +208,28 @@ angular.module('core').controller('HomeController', ['$scope','$filter', '$state
 
         Socket.on('FitbitData.received', function (data) {
             $scope.chartOptions.animation = false;
-            var tempTimestamp = [];
-            var finalTimestamp = "";
-            if (data.timestamp) {
-                tempTimestamp = data.timestamp.split("T")[1];
-                if (tempTimestamp) {
-                    var res1 = tempTimestamp.split(":");
-                    finalTimestamp = res1[0] + ":" + res1[1];
+                var tempTimestamp = [];
+                var finalTimestamp = "";
+                if (data.healthdata.timestamp) {
+                    tempTimestamp = data.healthdata.timestamp.split("T")[1];
+                    if (tempTimestamp) {
+                        var res1 = tempTimestamp.split(":");
+                        finalTimestamp = res1[0] + ":" + res1[1];
+                    }
                 }
-            }
-            $scope.labels.push(finalTimestamp);
-            tempList.push(data.value);
-            if ($scope.labels.length > 10) {
-                $scope.labels.shift();
-            }
-            if (tempList.length > 10) {
-                tempList.shift();
-            }
+                $scope.labels.push(finalTimestamp);
+                tempList.push(data.healthdata.value);
+                if ($scope.labels.length > 10) {
+                    $scope.labels.shift();
+                }
+                if (tempList.length > 10) {
+                    tempList.shift();
+                }
+                //Summary
+                if(data.minValue) $scope.dailyMin = data.minValue;
+                if(data.maxValue) $scope.dailyMax = data.maxValue;
+                if(data.avgValue) $scope.dailyAvg = data.avgValue;
+
         });
 
         $scope.onClick = function (points, evt) {

@@ -17,6 +17,7 @@
             <thead>
             <tr>
               <th>Name</th>
+              <th>Dosage</th>
               <th>Day</th>
               <th>Time</th>
             </tr>
@@ -24,6 +25,7 @@
             <tbody>
             <tr ng-repeat="cm in clientMedications">
               <td>{{cm.name}}</td>
+              <td>{{cm.dosage}}</td>
               <td>{{cm.day}}</td>
               <td>{{cm.time}}</td>
               <td>
@@ -47,9 +49,9 @@
       <div class="panel panel-default" style="margin-top: 70px">
         <div class="panel-heading">Daily Summary</div>
         <div class="panel-body">
-          <h5>Minimum &nbsp;&nbsp;&nbsp;<span class="badge">70</span></h5>
-          <h5>Average&nbsp;&nbsp;&nbsp;&nbsp; <span class="badge">74</span></h5>
-          <h5>Maximum&nbsp;&nbsp; <span class="badge">82</span></h5>
+          <h5>Minimum &nbsp;&nbsp;&nbsp;<span class="badge">{{dailyMin}}</span></h5>
+          <h5>Average&nbsp;&nbsp;&nbsp;&nbsp; <span class="badge">{{dailyAvg}}</span></h5>
+          <h5>Maximum&nbsp;&nbsp; <span class="badge">{{dailyMax}}</span></h5>
         </div>
     </div>
     </div>
