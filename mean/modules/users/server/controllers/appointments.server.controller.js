@@ -63,7 +63,12 @@ exports.getAppointments = function (req, res) {
  * Update a Appointment
  */
 exports.updateAppointment = function (req, res) {
-    var newAppointment = new Appointment(req.body);
+    var newAppointment = {};
+    newAppointment.patientId = req.body.patientId;
+    newAppointment.doctorId = req.body.doctorId;
+    newAppointment.pateintName = req.body.patientName;
+    newAppointment.time = req.body.time;
+    newAppointment.date = req.body.date;
     var appointmentId = req.params.appointmentId;
     User.findOne({username: newAppointment.doctorId}, 'username displayName address city state zipcode profileImageURL hospitalName phoneNumber', function (err, doctorInfo) {
         if (err) {
@@ -79,14 +84,15 @@ exports.updateAppointment = function (req, res) {
             newAppointment.state = doctorInfo.state;
             newAppointment.zipcode = doctorInfo.zipcode;
             newAppointment.doctorProfileImageURL = doctorInfo.profileImageURL;
+            delete newAppointment._id;
             console.log(newAppointment);
-            Appointment.update({_id: appointmentId}, newAppointment , function (err, data) {
+            Appointment.update({_id: appointmentId}, newAppointment ,  function (err, data) {
                 if (err) {
                     return res.status(400).send({
                         message: errorHandler.getErrorMessage(err)
                     });
                 } else {
-                    res.json({'Result': 'Appointment updated successfully', 'data': data});
+                    res.json({'Result': 'Appointment updated successfully'});
                 }
             });
         }
