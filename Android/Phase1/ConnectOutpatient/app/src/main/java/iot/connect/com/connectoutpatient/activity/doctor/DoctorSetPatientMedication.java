@@ -209,8 +209,8 @@ public class DoctorSetPatientMedication extends AppCompatActivity {
                         @Override
                         public void onResponse(JSONObject jsonObject) {
                             Log.d("Response", jsonObject.toString());
-                            //Toast.makeText(getApplicationContext(), jsonObject.toString(), Toast.LENGTH_SHORT).show();
-                            finish();
+                            Toast.makeText(getApplicationContext(), jsonObject.toString(), Toast.LENGTH_SHORT).show();
+                           // finish();
                         }
                     }, new Response.ErrorListener() {
                         @Override
