@@ -72,7 +72,7 @@ app.controller('DoctorDashboardController', ['$scope', '$filter', '$http','$uibM
             $scope.dateOptions.initDate = $filter('date')(selectedEvent.data.date, "dd-MMMM-yyyy");
             $scope.appointmentModalTitle = "Edit Appointment";
             $scope.selectedPatient = {};
-            $scope.appointmentTime =  moment(selectedEvent.data.time, "HH:mm").toDate();;
+            $scope.appointmentTime =  moment(selectedEvent.data.time, "HH:mm").toDate();
             $scope.appointmentModalInstance = $uibModal.open({
                 templateUrl: 'modules/users/client/views/appointment.client.view.html',
                 controller: 'DoctorDashboardController',
@@ -83,9 +83,16 @@ app.controller('DoctorDashboardController', ['$scope', '$filter', '$http','$uibM
                     "patientId": data.patientId,
                     "patientName": data.patientName,
                     "doctorId": Authentication.user.username,
+                    "patientProfileImageURL" : data.patientProfileImageURL,
                     "date": data.date,
                     "time": data.time,
                 }
+                payload.date = new Date(payload.date.getFullYear(), payload.date.getMonth(), payload.date.getDate(),
+                    payload.time.getHours(), payload.time.getMinutes(), payload.time.getSeconds());
+                var tempTime = "";
+                tempTime = $filter('date')(payload.time, "HH:mm");
+                console.log(tempTime);
+                payload.time = tempTime;
                 $http.post('/appointment/'+ selectedEvent.data._id,payload).success(function (response) {
                 }).error(function (response) {
                     $scope.error = response.message;
@@ -115,9 +122,16 @@ app.controller('DoctorDashboardController', ['$scope', '$filter', '$http','$uibM
                         "patientId": data.patientId,
                         "patientName": data.patientName,
                         "doctorId": Authentication.user.username,
+                        "patientProfileImageURL" : data.patientProfileImageURL,
                         "date": data.date,
                         "time": data.time,
                     }
+                payload.date = new Date(payload.date.getFullYear(), payload.date.getMonth(), payload.date.getDate(),
+                    payload.time.getHours(), payload.time.getMinutes(), payload.time.getSeconds());
+                var tempTime = "";
+                tempTime = $filter('date')(payload.time, "HH:mm");
+                console.log(tempTime);
+                payload.time = tempTime;
                 $http.post('/appointment',payload).success(function (response) {
                 }).error(function (response) {
                     $scope.error = response.message;
@@ -130,6 +144,7 @@ app.controller('DoctorDashboardController', ['$scope', '$filter', '$http','$uibM
             $scope.appointmentModalInstance.close({
                 "date": $scope.appointmentDate,
                 "time": $scope.appointmentTime,
+                "patientProfileImageURL" : $scope.selectedPatient.profileImageURL,
                 "patientId" : $scope.selectedPatient.patientNameD.username,
                 "patientName":  $scope.selectedPatient.patientNameD.displayName
             });
@@ -169,12 +184,12 @@ app.controller('DoctorDashboardController', ['$scope', '$filter', '$http','$uibM
             newEvent.startsAt = moment(data.date);
             newEvent.endsAt = moment(data.date);
             newEvent.data = data;
-            newEvent.title = '<img class="header-profile-image" ' +
+            newEvent.title =
+                '<img class="header-profile-image" ' +
                 'ng-src="' + data.patientProfileImageURL + '" ' +
                 'src="' + data.patientProfileImageURL + '"> ' +
                 '<span class="text-primary">' + data.patientName + '</span>';
             $scope.doctorEvents.push(newEvent);
         }
-
     }
 ]);

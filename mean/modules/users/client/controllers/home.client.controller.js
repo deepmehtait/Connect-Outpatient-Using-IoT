@@ -8,6 +8,7 @@ angular.module('core').controller('HomeController', ['$scope','$filter', '$state
         $scope.patientId = Authentication.user.username;
         $scope.patientHomeTitle = Authentication.user.firstName + "'s Status";
         $scope.patientName = Authentication.user.displayName;
+        $scope.patientImageURL = 'modules/users/client/img/profile/default.png';
         $scope.dailyMin = "0";
         $scope.dailyMax = "0";
         $scope.dailyAvg = "0";
@@ -20,6 +21,7 @@ angular.module('core').controller('HomeController', ['$scope','$filter', '$state
                 $scope.patientId = $stateParams.patientDetail.username;
                 $scope.patientHomeTitle = $stateParams.patientDetail.displayName + "'s Status";
                 $scope.patientName = $stateParams.patientDetail.displayName;
+                $scope.patientImageURL = $stateParams.patientDetail.patientProfileImageURL;
             }
             else{
                 $scope.patientHomeTitle = "Current Status";
@@ -201,6 +203,10 @@ angular.module('core').controller('HomeController', ['$scope','$filter', '$state
                     $scope.labels.push(finalTimestamp);
                     tempList.push(response.healthdata[i].value);
                 }
+                //Summary
+                if(response.minValue) $scope.dailyMin = response.minValue;
+                if(response.maxValue) $scope.dailyMax = response.maxValue;
+                if(response.avgValue) $scope.dailyAvg = response.avgValue;
             }
         }).error(function (response) {
             $scope.error = response.message;
@@ -277,7 +283,6 @@ angular.module('core').controller('HomeController', ['$scope','$filter', '$state
         $scope.ismeridian = true;
 
         //Date Picker options
-        $scope.appointmentDate = new Date();
         $scope.dateOptions = {
             startingDay: 1
         };
@@ -303,7 +308,7 @@ angular.module('core').controller('HomeController', ['$scope','$filter', '$state
             $scope.appointmentDate = $filter('date')(selectedEvent.data.date, "dd-MMMM-yyyy");
             $scope.dateOptions.initDate = $filter('date')(selectedEvent.data.date, "dd-MMMM-yyyy");
             $scope.appointmentModalTitle = "Edit Appointment";
-            $scope.appointmentTime =  moment(selectedEvent.data.time, "HH:mm").toDate();;
+            $scope.appointmentTime =  moment(selectedEvent.data.time, "HH:mm").toDate();
             $scope.appointmentModalInstance = $uibModal.open({
                 templateUrl: 'modules/users/client/views/appointment.client.view.html',
                 controller: 'HomeController',
@@ -314,9 +319,17 @@ angular.module('core').controller('HomeController', ['$scope','$filter', '$state
                     "patientId": data.patientId,
                     "patientName": data.patientName,
                     "doctorId": Authentication.user.username,
+                    "patientProfileImageURL" : $scope.patientImageURL,
                     "date": data.date,
                     "time": data.time,
                 }
+                console.log(payload);
+                payload.date = new Date(payload.date.getFullYear(), payload.date.getMonth(), payload.date.getDate(),
+                    payload.time.getHours(), payload.time.getMinutes(), payload.time.getSeconds());
+                var tempTime = "";
+                tempTime = $filter('date')(payload.time, "HH:mm");
+                payload.time = tempTime;
+                console.log(payload);
                 $http.post('/appointment/'+ selectedEvent.data._id,payload).success(function (response) {
                 }).error(function (response) {
                     $scope.error = response.message;
@@ -341,10 +354,18 @@ angular.module('core').controller('HomeController', ['$scope','$filter', '$state
                     "patientId": data.patientId,
                     "patientName": data.patientName,
                     "doctorId": Authentication.user.username,
+                    "patientProfileImageURL" : $scope.patientImageURL,
                     "date": data.date,
                     "time": data.time,
                 }
-                console.log(payload);
+
+                payload.date = new Date(payload.date.getFullYear(), payload.date.getMonth(), payload.date.getDate(),
+                    payload.time.getHours(), payload.time.getMinutes(), payload.time.getSeconds());
+                var tempTime = "";
+                tempTime = $filter('date')(payload.time, "HH:mm");
+                console.log(tempTime);
+                payload.time = tempTime;
+
                 $http.post('/appointment',payload).success(function (response) {
                 }).error(function (response) {
                     $scope.error = response.message;
@@ -383,6 +404,7 @@ angular.module('core').controller('HomeController', ['$scope','$filter', '$state
         });
 
         Socket.on('appointment.deleted', function (data) {
+            console.log(data);
             angular.forEach($scope.events, function (appointmentInfo, index) {
                 if (appointmentInfo.data._id == data) {
                     $scope.events.splice(index, 1);
@@ -396,9 +418,9 @@ angular.module('core').controller('HomeController', ['$scope','$filter', '$state
             newEvent.endsAt = moment(data.date);
             newEvent.data = data;
             newEvent.title = '<img class="header-profile-image" ' +
-                'ng-src="' + data.patientProfileImageURL + '" ' +
-                'src="' + data.patientProfileImageURL + '"> ' +
-                '<span class="text-primary">' + data.patientName + '</span>';
+                'ng-src="' + data.doctorProfileImageURL + '" ' +
+                'src="' + data.doctorProfileImageURL + '"> ' +
+                '<span class="text-primary">' + data.doctorName + '</span>';
             $scope.events.push(newEvent);
         }
 
