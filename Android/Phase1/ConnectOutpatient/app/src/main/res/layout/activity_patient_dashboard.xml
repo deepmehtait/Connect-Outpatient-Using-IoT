@@ -60,7 +60,8 @@
                                 android:text="63"
                                 android:id="@+id/minValue"
                                 android:textColor="#00ff00"
-                                android:textSize="60dp" />
+                                android:textSize="55dp"
+                                android:maxLength="3"/>
 
                             <TextView
                                 android:layout_width="wrap_content"
@@ -93,7 +94,8 @@
                                 android:text="77"
                                 android:id="@+id/averageValue"
                                 android:textColor="@color/primary"
-                                android:textSize="60dp" />
+                                android:textSize="55dp"
+                                android:maxLength="3" />
 
                             <TextView
                                 android:layout_width="wrap_content"
@@ -127,7 +129,8 @@
                                 android:text="89"
                                 android:id="@+id/maxValue"
                                 android:textColor="#ff0000"
-                                android:textSize="60dp" />
+                                android:textSize="55dp"
+                                android:maxLength="3" />
 
                             <TextView
                                 android:layout_width="wrap_content"

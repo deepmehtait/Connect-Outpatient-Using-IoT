@@ -39,6 +39,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.regex.Pattern;
 
 import iot.connect.com.connectoutpatient.R;
 import iot.connect.com.connectoutpatient.activity.doctor.DoctorDashboardActivity;
@@ -101,9 +102,12 @@ public class PatientDashboardActivity extends AppCompatActivity {
                 Gson gs=new Gson();
                 HealthData healthData=gs.fromJson(jsonObject.toString(),HealthData.class);
                 if(healthData.getResult()==null){
-                    min.setText(healthData.getMinValue());
-                    max.setText(healthData.getMaxValue());
-                    average.setText(healthData.getAvgValue());
+                    String[] minvalue = healthData.getMinValue().split(Pattern.quote("."));
+                    String[] maxvalue = healthData.getMaxValue().split(Pattern.quote("."));
+                    String[] avgvalue = healthData.getAvgValue().split(Pattern.quote("."));
+                    min.setText(minvalue[0]);
+                    max.setText(maxvalue[0]);
+                    average.setText(avgvalue[0]);
                     Log.d("length-",""+healthData.getHealthdata().size());
 
                     for(int i=0;i<healthData.getHealthdata().size();i++){
@@ -144,9 +148,12 @@ public class PatientDashboardActivity extends AppCompatActivity {
                         Gson gs=new Gson();
                         HealthData healthData=gs.fromJson(jsonObject.toString(),HealthData.class);
                         if(healthData.getResult()==null){
-                            min.setText(healthData.getMinValue());
-                            max.setText(healthData.getMaxValue());
-                            average.setText(healthData.getAvgValue());
+                            String[] minvalue = healthData.getMinValue().split(Pattern.quote("."));
+                            String[] maxvalue = healthData.getMaxValue().split(Pattern.quote("."));
+                            String[] avgvalue = healthData.getAvgValue().split(Pattern.quote("."));
+                            min.setText(minvalue[0]);
+                            max.setText(maxvalue[0]);
+                            average.setText(avgvalue[0]);
                             Log.d("length-",""+healthData.getHealthdata().size());
                             for(int i=0;i<healthData.getHealthdata().size();i++){
                                 Log.d("i-",healthData.getHealthdata().get(i).getValue()+","+i);

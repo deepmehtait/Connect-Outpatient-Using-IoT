@@ -2,7 +2,6 @@ package iot.connect.com.connectoutpatient.activity.doctor;
 
 import android.content.Intent;
 import android.graphics.Color;
-import android.media.Image;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.annotation.Nullable;
@@ -32,9 +31,9 @@ import com.squareup.picasso.Picasso;
 
 import org.json.JSONObject;
 
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.regex.Pattern;
 
 import iot.connect.com.connectoutpatient.R;
 import iot.connect.com.connectoutpatient.modals.HealthData;
@@ -45,58 +44,62 @@ import iot.connect.com.connectoutpatient.utils.AppBaseURL;
  */
 public class DoctorPatientDetail extends AppCompatActivity {
     ImageView profilepic;
-    TextView Name,Moreinfo;
-    TextView min,max,average;
+    TextView Name, Moreinfo;
+    TextView min, max, average;
     GraphView graph;
     Button viewMedication;
     Runnable timer1;
-    int count=0;
+    int count = 0;
     private final Handler mHandler = new Handler();
+
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_doctor_patient_detail);
-        profilepic=(ImageView)findViewById(R.id.patientProfilePic);
-        Name=(TextView)findViewById(R.id.patientdetailName);
-        Moreinfo=(TextView)findViewById(R.id.patientdetailMoreInfo);
-        viewMedication=(Button)findViewById(R.id.btn_viewMedication);
-        Intent i=getIntent();
-        String PName=i.getStringExtra("patientName");
-        String PPicUrl=i.getStringExtra("picURL");
-        final String PUsername=i.getStringExtra("id");
-        Picasso.with(getApplicationContext()).load(AppBaseURL.BaseURL+PPicUrl).into(profilepic);
-        Name.setText("Name: "+PName);
-        Moreinfo.setText(PName+" has recently been diagnosed with heart pain issues.\nThe Patient have been recently examined for regular post surgery check and shown good sign of recovery. ");
-        final int counter=0;
-         min=(TextView)findViewById(R.id.minValue);
-         max=(TextView)findViewById(R.id.maxValue);
-         average=(TextView)findViewById(R.id.averageValue);
+        profilepic = (ImageView) findViewById(R.id.patientProfilePic);
+        Name = (TextView) findViewById(R.id.patientdetailName);
+        Moreinfo = (TextView) findViewById(R.id.patientdetailMoreInfo);
+        viewMedication = (Button) findViewById(R.id.btn_viewMedication);
+        Intent i = getIntent();
+        String PName = i.getStringExtra("patientName");
+        String PPicUrl = i.getStringExtra("picURL");
+        final String PUsername = i.getStringExtra("id");
+        Picasso.with(getApplicationContext()).load(AppBaseURL.BaseURL + PPicUrl).into(profilepic);
+        Name.setText("Name: " + PName);
+        Moreinfo.setText(PName + " has recently been diagnosed with heart pain issues.\nThe Patient have been recently examined for regular post surgery check and shown good sign of recovery. ");
+        final int counter = 0;
+        min = (TextView) findViewById(R.id.minValue);
+        max = (TextView) findViewById(R.id.maxValue);
+        average = (TextView) findViewById(R.id.averageValue);
 
         /// Generate graph
 
         graph = (GraphView) findViewById(R.id.graph);
-        final LineGraphSeries<DataPoint> seriesHR=new LineGraphSeries<DataPoint>();
+        final LineGraphSeries<DataPoint> seriesHR = new LineGraphSeries<DataPoint>();
 
         // get fitbit data
-        String url= AppBaseURL.BaseURL+"fitbitdata/testuser1";
+        String url = AppBaseURL.BaseURL + "fitbitdata/testuser1";
         JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(Request.Method.GET, url,
                 new JSONObject(), new Response.Listener<JSONObject>() {
             @Override
             public void onResponse(JSONObject jsonObject) {
                 Log.d("Response", jsonObject.toString());
-                Gson gs=new Gson();
-                HealthData healthData=gs.fromJson(jsonObject.toString(),HealthData.class);
-                if(healthData.getResult()==null){
-                min.setText(healthData.getMinValue());
-                max.setText(healthData.getMaxValue());
-                average.setText(healthData.getAvgValue());
-                Log.d("length-",""+healthData.getHealthdata().size());
+                Gson gs = new Gson();
+                HealthData healthData = gs.fromJson(jsonObject.toString(), HealthData.class);
+                if (healthData.getResult() == null) {
+                    String[] minvalue = healthData.getMinValue().split(Pattern.quote("."));
+                    String[] maxvalue = healthData.getMaxValue().split(Pattern.quote("."));
+                    String[] avgvalue = healthData.getAvgValue().split(Pattern.quote("."));
+                    min.setText(minvalue[0]);
+                    max.setText(maxvalue[0]);
+                    average.setText(avgvalue[0]);
+                    Log.d("length-", "" + healthData.getHealthdata().size());
 
-                for(int i=0;i<healthData.getHealthdata().size();i++){
-                    Log.d("i-",""+i);
-                    seriesHR.appendData(new DataPoint(getCount(),Double.parseDouble( healthData.getHealthdata().get(i).getValue())),true,50);
-                }
-                graph.addSeries(seriesHR);
+                    for (int i = 0; i < healthData.getHealthdata().size(); i++) {
+                        Log.d("i-", "" + i);
+                        seriesHR.appendData(new DataPoint(getCount(), Double.parseDouble(healthData.getHealthdata().get(i).getValue())), true, 50);
+                    }
+                    graph.addSeries(seriesHR);
                 }
             }
         }, new Response.ErrorListener() {
@@ -105,7 +108,7 @@ public class DoctorPatientDetail extends AppCompatActivity {
                 Log.d("Error.Response", error.getMessage());
             }
         }
-        ){
+        ) {
             @Override
             public Map<String, String> getHeaders() throws AuthFailureError {
                 HashMap<String, String> headers = new HashMap<String, String>();
@@ -115,26 +118,29 @@ public class DoctorPatientDetail extends AppCompatActivity {
         };
         jsonObjectRequest.setShouldCache(false);
         Volley.newRequestQueue(getApplication()).add(jsonObjectRequest);
-        timer1=new Runnable() {
+        timer1 = new Runnable() {
             @Override
             public void run() {
-                Log.d("run","run now");
-                String url= AppBaseURL.BaseURL+"fitbitdata/testuser1";
+                Log.d("run", "run now");
+                String url = AppBaseURL.BaseURL + "fitbitdata/testuser1";
                 JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(Request.Method.GET, url,
                         new JSONObject(), new Response.Listener<JSONObject>() {
                     @Override
                     public void onResponse(JSONObject jsonObject) {
                         Log.d("Response", jsonObject.toString());
-                        Gson gs=new Gson();
-                        HealthData healthData=gs.fromJson(jsonObject.toString(),HealthData.class);
-                        if(healthData.getResult()==null){
-                            min.setText(healthData.getMinValue());
-                            max.setText(healthData.getMaxValue());
-                            average.setText(healthData.getAvgValue());
-                            Log.d("length-",""+healthData.getHealthdata().size());
-                            for(int i=0;i<healthData.getHealthdata().size();i++){
-                                Log.d("i-",""+i);
-                                seriesHR.appendData(new DataPoint(getCount(),Double.parseDouble( healthData.getHealthdata().get(i).getValue())),true,50);
+                        Gson gs = new Gson();
+                        HealthData healthData = gs.fromJson(jsonObject.toString(), HealthData.class);
+                        if (healthData.getResult() == null) {
+                            String[] minvalue = healthData.getMinValue().split(Pattern.quote("."));
+                            String[] maxvalue = healthData.getMaxValue().split(Pattern.quote("."));
+                            String[] avgvalue = healthData.getAvgValue().split(Pattern.quote("."));
+                            min.setText(minvalue[0]);
+                            max.setText(maxvalue[0]);
+                            average.setText(avgvalue[0]);
+                            Log.d("length-", "" + healthData.getHealthdata().size());
+                            for (int i = 0; i < healthData.getHealthdata().size(); i++) {
+                                Log.d("i-", "" + i);
+                                seriesHR.appendData(new DataPoint(getCount(), Double.parseDouble(healthData.getHealthdata().get(i).getValue())), true, 50);
 
                             }
                             graph.addSeries(seriesHR);
@@ -147,7 +153,7 @@ public class DoctorPatientDetail extends AppCompatActivity {
                         Log.d("Error.Response", error.getMessage());
                     }
                 }
-                ){
+                ) {
                     @Override
                     public Map<String, String> getHeaders() throws AuthFailureError {
                         HashMap<String, String> headers = new HashMap<String, String>();
@@ -157,16 +163,16 @@ public class DoctorPatientDetail extends AppCompatActivity {
                 };
                 jsonObjectRequest.setShouldCache(false);
                 Volley.newRequestQueue(getApplication()).add(jsonObjectRequest);
-                }
+            }
         };
-        mHandler.postDelayed(timer1,60000);
+        mHandler.postDelayed(timer1, 60000);
         graph.setTitle("Heart Rate Log");
         graph.getViewport().setScrollable(true);
         seriesHR.setDrawDataPoints(true);
         seriesHR.setDataPointsRadius(5);
         seriesHR.setColor(Color.GREEN);
         StaticLabelsFormatter staticLabelsFormatter = new StaticLabelsFormatter(graph);
-        staticLabelsFormatter.setVerticalLabels(new String[] {"50", "70", "90","110","130"});
+        staticLabelsFormatter.setVerticalLabels(new String[]{"50", "70", "90", "110", "130"});
         graph.getViewport().setYAxisBoundsManual(true);
         graph.getViewport().setXAxisBoundsManual(true);
         graph.getViewport().setMaxY(23);
@@ -187,14 +193,15 @@ public class DoctorPatientDetail extends AppCompatActivity {
         viewMedication.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent i = new Intent(DoctorPatientDetail.this,DoctorViewPatientMedication.class);
-                i.putExtra("id",PUsername);
+                Intent i = new Intent(DoctorPatientDetail.this, DoctorViewPatientMedication.class);
+                i.putExtra("id", PUsername);
                 startActivity(i);
             }
         });
 
     }
-    private int  getCount(){
+
+    private int getCount() {
         return count++;
 
     }
